@@ -13,15 +13,16 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
     private List<Usuario> usuarios;
 
     public UsuarioDAOMemoria() {
-        usuarios = new ArrayList<Usuario>();
-        crear(new Usuario("admin", "12345", Rol.ADMINISTRADOR));
-        crear(new Usuario("user", "12345", Rol.USUARIO));
+        usuarios = new ArrayList<>();
+        // Usuarios por defecto
+        crear(new Usuario("admin", Rol.ADMINISTRADOR, "12345"));
+        crear(new Usuario("usuario", Rol.USUARIO, "12345"));
     }
 
     @Override
-    public Usuario autenticar(String username, String contrasenia) {
+    public Usuario autenticar(String username, String password) {
         for (Usuario usuario : usuarios) {
-            if(usuario.getUsername().equals(username) && usuario.getContrasenia().equals(contrasenia)){
+            if (usuario.getUsername().equals(username) && usuario.getContrasenia().equals(password)) {
                 return usuario;
             }
         }
@@ -30,11 +31,13 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
 
     @Override
     public void crear(Usuario usuario) {
-        usuarios.add(usuario);
+        if (buscarPorUsuario(usuario.getUsername()) == null) {
+            usuarios.add(usuario);
+        }
     }
 
     @Override
-    public Usuario buscarPorUsername(String username) {
+    public Usuario buscarPorUsuario(String username) {
         for (Usuario usuario : usuarios) {
             if (usuario.getUsername().equals(username)) {
                 return usuario;
@@ -45,21 +48,20 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
 
     @Override
     public void eliminar(String username) {
-       Iterator<Usuario> iterator = usuarios.iterator();
-       while (iterator.hasNext()) {
-           Usuario usuario = iterator.next();
-           if (usuario.getUsername().equals(username)) {
-               iterator.remove();
-               break;
-           }
-       }
+        Iterator<Usuario> iterator = usuarios.iterator();
+        while (iterator.hasNext()) {
+            Usuario usuario = iterator.next();
+            if (usuario.getUsername().equals(username)) {
+                iterator.remove();
+                break;
+            }
+        }
     }
 
     @Override
     public void actualizar(Usuario usuario) {
-        for(int i = 0; i < usuarios.size(); i++){
-            Usuario usuarioAux = usuarios.get(i);
-            if(usuarioAux.getUsername().equals(usuario.getUsername())){
+        for (int i = 0; i < usuarios.size(); i++) {
+            if (usuarios.get(i).getUsername().equals(usuario.getUsername())) {
                 usuarios.set(i, usuario);
                 break;
             }
@@ -67,20 +69,28 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
     }
 
     @Override
-    public List<Usuario> listarTodos() {
-        return usuarios;
+    public List<Usuario> listarAdministradores() {
+        return listarRol(Rol.ADMINISTRADOR);
     }
 
     @Override
-    public List<Usuario> listarPorRol(Rol rol) {
-        List<Usuario> usuariosEncontrados = new ArrayList<>();
+    public List<Usuario> listarUsuarios() {
+        return listarRol(Rol.USUARIO);
+    }
 
+    @Override
+    public List<Usuario> listarRol(Rol rol) {
+        List<Usuario> usuariosRol = new ArrayList<>();
         for (Usuario usuario : usuarios) {
-            if (usuario.getRol().equals(rol)) {
-                usuariosEncontrados.add(usuario);
+            if (usuario.getRol() == rol) {
+                usuariosRol.add(usuario);
             }
         }
+        return usuariosRol;
+    }
 
-        return usuariosEncontrados;
+    @Override
+    public List<Usuario> listarTodos() {
+        return new ArrayList<>(usuarios); // Retorna copia por seguridad
     }
 }

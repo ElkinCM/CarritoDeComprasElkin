@@ -6,32 +6,18 @@ public class LoginView extends JFrame {
     private JPanel panelPrincipal;
     private JPanel panelSecundario;
     private JTextField txtUsername;
-    private JPasswordField txtContrasenia;
+    private JPasswordField psfContraseña;
     private JButton btnIniciarSesion;
     private JButton btnRegistrarse;
 
     public LoginView() {
         setContentPane(panelPrincipal);
-        setTitle("Iniciar Sesión");
+        setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
+        setSize(500, 500);
         setLocationRelativeTo(null);
-    }
+        setResizable(false);
 
-    public JPanel getPanelPrincipal() {
-        return panelPrincipal;
-    }
-
-    public void setPanelPrincipal(JPanel panelPrincipal) {
-        this.panelPrincipal = panelPrincipal;
-    }
-
-    public JPanel getPanelSecundario() {
-        return panelSecundario;
-    }
-
-    public void setPanelSecundario(JPanel panelSecundario) {
-        this.panelSecundario = panelSecundario;
     }
 
     public JTextField getTxtUsername() {
@@ -42,12 +28,12 @@ public class LoginView extends JFrame {
         this.txtUsername = txtUsername;
     }
 
-    public JPasswordField getTxtContrasenia() {
-        return txtContrasenia;
+    public JPasswordField getPsfContraseña() {
+        return psfContraseña;
     }
 
-    public void setTxtContrasenia(JPasswordField txtContrasenia) {
-        this.txtContrasenia = txtContrasenia;
+    public void setPsfContraseña(JPasswordField psfContraseña) {
+        this.psfContraseña = psfContraseña;
     }
 
     public JButton getBtnIniciarSesion() {
@@ -65,7 +51,6 @@ public class LoginView extends JFrame {
     public void setBtnRegistrarse(JButton btnRegistrarse) {
         this.btnRegistrarse = btnRegistrarse;
     }
-
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }

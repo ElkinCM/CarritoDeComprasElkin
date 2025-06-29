@@ -7,20 +7,37 @@ import java.util.List;
 
 public class Carrito {
 
-    private final double IVA = 0.12;
-
-    private static int contador = 1;
-
     private int codigo;
+    private static int contador = 1;
+    private GregorianCalendar fecha;
+    private final List<ItemCarrito> items;
+    private Usuario usuario;
 
-    private GregorianCalendar fechaCreacion;
-
-    private List<ItemCarrito> items;
+    @Override
+    public String toString() {
+        return "Carrito{" +
+                "codigo=" + codigo +
+                ", fecha=" + (fecha != null ? fecha.getTime() : "N/A") +
+                ", items=" + items.size() + " items" +
+                ", subtotal=" + String.format("%.2f", calcularSubtotal()) +
+                ", total=" + String.format("%.2f", calcularTotal()) +
+                ", IVA=" + String.format("%.2f", calcularIVA()) +
+                ", usuario=" + (usuario != null ? usuario.getUsername() : "N/A") +
+                '}';
+    }
 
     public Carrito() {
-        codigo = contador++;
-        items = new ArrayList<>();
-        fechaCreacion = new GregorianCalendar();
+        this.items = new ArrayList<>();
+        this.codigo = contador++;
+        this.fecha = new GregorianCalendar();
+    }
+
+
+    public Carrito(int codigo, GregorianCalendar fecha, Usuario usuario) {
+        this.items = new ArrayList<>();
+        this.codigo = codigo;
+        this.fecha = fecha;
+        this.usuario = usuario;
     }
 
     public int getCodigo() {
@@ -31,65 +48,68 @@ public class Carrito {
         this.codigo = codigo;
     }
 
-    public GregorianCalendar getFechaCreacion() {
-        return fechaCreacion;
+    public GregorianCalendar getFecha() {
+        return fecha;
     }
 
-    public void setFechaCreacion(GregorianCalendar fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
+    public void setFecha(GregorianCalendar fecha) {
+        this.fecha = fecha;
     }
 
     public void agregarProducto(Producto producto, int cantidad) {
-        items.add(new ItemCarrito(producto, cantidad));
+        for (ItemCarrito item : items) {
+            if (item.getProducto().getCodigo() == producto.getCodigo()) {
+                item.setCantidad(item.getCantidad() + cantidad);
+                return; // Producto ya agregado, cantidad actualizada
+            }
+        }
+        ItemCarrito item = new ItemCarrito(producto, cantidad);
+        items.add(item);
     }
 
     public void eliminarProducto(int codigoProducto) {
-        Iterator<ItemCarrito> it = items.iterator();
-        while (it.hasNext()) {
-            if (it.next().getProducto().getCodigo() == codigoProducto) {
-                it.remove();
-                break;
+        items.removeIf(item -> item.getProducto().getCodigo() == codigoProducto);
+    }
+
+    public void actualizarCantidadProducto(int codigoProducto, int nuevaCantidad) {
+        if (nuevaCantidad <= 0) {
+            eliminarProducto(codigoProducto);
+            return;
+        }
+        for (ItemCarrito item : items) {
+            if (item.getProducto().getCodigo() == codigoProducto) {
+                item.setCantidad(nuevaCantidad);
+                return;
             }
         }
     }
 
-    public void vaciarCarrito() {
-        items.clear();
-    }
-
-    public List<ItemCarrito> obtenerItems() {
-        return items;
-    }
-
-    public boolean estaVacio() {
-        return items.isEmpty();
-    }
-
     public double calcularSubtotal() {
-        double subtotal = 0;
+        double currentSubtotal = 0;
         for (ItemCarrito item : items) {
-            subtotal += item.getProducto().getPrecio() * item.getCantidad();
+            currentSubtotal += item.getSubtotal();
         }
-        return subtotal;
+        return currentSubtotal;
     }
 
     public double calcularIVA() {
-        double subtotal = calcularSubtotal();
-        return subtotal * IVA;
+        return calcularSubtotal() * 0.12;
     }
 
     public double calcularTotal() {
         return calcularSubtotal() + calcularIVA();
     }
 
-    @Override
-    public String toString() {
-        return "Carrito{" +
-                "IVA=" + IVA +
-                ", codigo=" + codigo +
-                ", fechaCreacion=" + fechaCreacion +
-                ", items=" + items +
-                '}';
+    public List<ItemCarrito> obtenerItems() {
+        return new ArrayList<>(items);
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }
 
