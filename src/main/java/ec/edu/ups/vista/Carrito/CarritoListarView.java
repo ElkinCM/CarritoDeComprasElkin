@@ -2,11 +2,15 @@ package ec.edu.ups.vista.Carrito;
 
 import ec.edu.ups.modelo.Carrito;
 import ec.edu.ups.modelo.ItemCarrito;
+import ec.edu.ups.util.FormateadorUtils;
+import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.net.URL;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class CarritoListarView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -15,8 +19,165 @@ public class CarritoListarView extends JInternalFrame {
     private JTable tblCarritos;
     private JButton btnListar;
     private JTable tblDetalles;
+    private JLabel lblTitulo;
+    private JLabel lblCodigo;
+    private JLabel lblDetalles;
+
     private DefaultTableModel modelo;
     private DefaultTableModel modeloDetalles;
+
+    private List<Carrito> listaActual;
+    private Carrito carritoActual;
+
+    private MensajeInternacionalizacionHandler mensaje;
+    private Locale locale;
+
+    public CarritoListarView(MensajeInternacionalizacionHandler mensaje) {
+        super("", true, true, false, true);
+        this.mensaje = mensaje;
+        this.locale = new Locale(mensaje.get("locale.lang"), mensaje.get("locale.country"));
+
+        setContentPane(panelPrincipal);
+        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        setSize(800, 600);
+
+        // Íconos opcionales
+        URL urlListar = getClass().getResource("/list.png");
+        URL urlBuscar = getClass().getResource("/search.png");
+
+        if (urlListar != null) btnListar.setIcon(new ImageIcon(urlListar));
+        if (urlBuscar != null) btnBuscar.setIcon(new ImageIcon(urlBuscar));
+
+        // Modelos de tablas
+        modelo = new DefaultTableModel();
+        tblCarritos.setModel(modelo);
+
+        modeloDetalles = new DefaultTableModel();
+        tblDetalles.setModel(modeloDetalles);
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        this.locale = new Locale(mensaje.get("locale.lang"), mensaje.get("locale.country"));
+
+        setTitle(mensaje.get("car.listar.titulo.app"));
+        if (lblTitulo != null) lblTitulo.setText(mensaje.get("car.listar.titulo.app"));
+        if (lblCodigo != null) lblCodigo.setText(mensaje.get("global.codigo") + ":");
+        if (lblDetalles != null) lblDetalles.setText(mensaje.get("global.detalles"));
+
+        txtCodigo.setToolTipText(mensaje.get("car.top.codigo"));
+
+        btnBuscar.setText(mensaje.get("btn.buscar"));
+        btnListar.setText(mensaje.get("menu.car.listar"));
+
+        Object[] columnas = {
+                mensaje.get("global.codigo"),
+                mensaje.get("global.usuario"),
+                mensaje.get("global.fecha"),
+                mensaje.get("global.item"),
+                mensaje.get("global.subtotal"),
+                mensaje.get("global.iva"),
+                mensaje.get("global.total")
+        };
+        modelo.setColumnIdentifiers(columnas);
+
+        Object[] columnasDetalles = {
+                mensaje.get("global.codigo"),
+                mensaje.get("global.nombre"),
+                mensaje.get("global.precio"),
+                mensaje.get("global.cantidad"),
+                mensaje.get("global.subtotal")
+        };
+        modeloDetalles.setColumnIdentifiers(columnasDetalles);
+
+        mostrarDetallesCarrito(carritoActual);
+        mostrarCarritos(listaActual);
+    }
+
+    public void mostrarCarritos(List<Carrito> carritos) {
+        this.listaActual = carritos;
+        modelo.setRowCount(0);
+        if (carritos == null) return;
+
+        limpiarTablaDetalles();
+
+        for (Carrito carrito : carritos) {
+            Object[] fila = {
+                    carrito.getCodigo(),
+                    carrito.getUsuario() != null ? carrito.getUsuario().getUsername() : "N/A",
+                    carrito.getFecha() != null ? FormateadorUtils.formatearFecha(carrito.getFecha().getTime(), locale) : "N/A",
+                    carrito.obtenerItems().size(),
+                    FormateadorUtils.formatearMoneda(carrito.calcularSubtotal(), locale),
+                    FormateadorUtils.formatearMoneda(carrito.calcularIVA(), locale),
+                    FormateadorUtils.formatearMoneda(carrito.calcularTotal(), locale)
+            };
+            modelo.addRow(fila);
+        }
+    }
+
+    public void mostrarDetallesCarrito(Carrito carrito) {
+        this.carritoActual = carrito;
+        limpiarTablaDetalles();
+
+        if (carrito != null) {
+            for (ItemCarrito item : carrito.obtenerItems()) {
+                Object[] fila = {
+                        item.getProducto().getCodigo(),
+                        item.getProducto().getNombre(),
+                        FormateadorUtils.formatearMoneda(item.getProducto().getPrecio(), locale),
+                        item.getCantidad(),
+                        FormateadorUtils.formatearMoneda(item.getSubtotal(), locale)
+                };
+                modeloDetalles.addRow(fila);
+            }
+        }
+    }
+
+    public void limpiarTablaDetalles() {
+        modeloDetalles.setRowCount(0);
+    }
+
+    public void mostrarMensaje(String mensajes) {
+        JOptionPane.showMessageDialog(this, mensajes, mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // Getters & Setters
+    public JTextField getTxtCodigo() {
+        return txtCodigo;
+    }
+
+    public JButton getBtBuscar() {
+        return btnBuscar;
+    }
+
+    public JButton getBtnListar() {
+        return btnListar;
+    }
+
+    public JTable getTblCarritos() {
+        return tblCarritos;
+    }
+
+    public JTable getTblDetalles() {
+        return tblDetalles;
+    }
+
+    public DefaultTableModel getModelo() {
+        return modelo;
+    }
+
+    public void setModelo(DefaultTableModel modelo) {
+        this.modelo = modelo;
+    }
+
+    public DefaultTableModel getModeloDetalles() {
+        return modeloDetalles;
+    }
+
+    public void setModeloDetalles(DefaultTableModel modeloDetalles) {
+        this.modeloDetalles = modeloDetalles;
+    }
 
     public JPanel getPanelPrincipal() {
         return panelPrincipal;
@@ -34,110 +195,15 @@ public class CarritoListarView extends JInternalFrame {
         this.btnBuscar = btBuscar;
     }
 
-    public JTable getTblCarritos() {
-        return tblCarritos;
-    }
-
     public void setTblCarritos(JTable tblCarritos) {
         this.tblCarritos = tblCarritos;
-    }
-
-    public JButton getBtnListar() {
-        return btnListar;
     }
 
     public void setBtnListar(JButton btnListar) {
         this.btnListar = btnListar;
     }
 
-    public JTable getTable1() {
-        return tblDetalles;
-    }
-
-    public void setTable1(JTable table1) {
-        this.tblDetalles = table1;
-    }
-
-    public DefaultTableModel getModelo() {
-        return modelo;
-    }
-
-    public void setModelo(DefaultTableModel modelo) {
-        this.modelo = modelo;
-    }
-
-    public CarritoListarView() {
-        super("[ADMIN] Listar Carrito de compras", true, true, false, true);
-        setContentPane(panelPrincipal);
-        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-        setSize(600, 400);
-
-        modelo = new DefaultTableModel();
-        Object[] columnas = {"Código Carrito", "Usuario", "Fecha", "Cantidad Items", "Subtotal", "IVA", "Total"};
-        modelo.setColumnIdentifiers(columnas);
-        tblCarritos.setModel(modelo);
-
-        modeloDetalles = new DefaultTableModel();
-        Object[] columnasDetalles = {"Cod. Producto", "Nombre", "Precio Unit.", "Cantidad", "Subtotal"};
-        modeloDetalles.setColumnIdentifiers(columnasDetalles);
-        tblDetalles.setModel(modeloDetalles);
-    }
-
-
-    public JTextField getTxtCodigo() {
-        return txtCodigo;
-    }
-
-    public JButton getBtBuscar() {
-        return btnBuscar;
-    }
-
-    public JButton getListarButton() {
-        return btnListar;
-    }
-
-    public void mostrarCarritos(List<Carrito> carritos) {
-        modelo.setRowCount(0);
-        for (Carrito carrito : carritos) {
-            Object[] fila = {
-                    carrito.getCodigo(),
-                    carrito.getUsuario() != null ? carrito.getUsuario().getUsername() : "N/A",
-                    carrito.getFecha() != null ? String.format("%02d/%02d/%d", carrito.getFecha().get(GregorianCalendar.DAY_OF_MONTH), carrito.getFecha().get(GregorianCalendar.MONTH) + 1, carrito.getFecha().get(GregorianCalendar.YEAR)) : "N/A",
-                    carrito.obtenerItems().size(),
-                    String.format("%.2f", carrito.calcularSubtotal()),
-                    String.format("%.2f", carrito.calcularIVA()),
-                    String.format("%.2f", carrito.calcularTotal())
-            };
-            modelo.addRow(fila);
-        }
-    }
-
-
-    public void mostrarDetallesCarrito(Carrito carrito) {
-        limpiarTablaDetalles();
-
-        if (carrito != null) {
-            List<ItemCarrito> items = carrito.obtenerItems();
-            for (ItemCarrito item : items) {
-                Object[] fila = {
-                        item.getProducto().getCodigo(),
-                        item.getProducto().getNombre(),
-                        item.getProducto().getPrecio(),
-                        item.getCantidad(),
-                        item.getSubtotal()
-                };
-                modeloDetalles.addRow(fila);
-            }
-        }
-    }
-
-
-    public void limpiarTablaDetalles() {
-        modeloDetalles.setRowCount(0);
-    }
-
-
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+    public void setTblDetalles(JTable tblDetalles) {
+        this.tblDetalles = tblDetalles;
     }
 }

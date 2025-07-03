@@ -1,9 +1,14 @@
 package ec.edu.ups.vista.Carrito;
 
+import ec.edu.ups.modelo.Carrito;
+import ec.edu.ups.modelo.ItemCarrito;
+import ec.edu.ups.util.FormateadorUtils;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.Locale;
 
 public class CarritoAnadirView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -19,26 +24,102 @@ public class CarritoAnadirView extends JInternalFrame {
     private JButton btnBuscar;
     private JButton btnAñadir;
     private JButton btnLimpiar;
-    private JComboBox cbxCantidad;
+    private JComboBox<String> cbxCantidad;
     private DefaultTableModel modelo;
+    private Carrito carritoActual;
+    private Locale locale;
+    private final MensajeInternacionalizacionHandler mensajes;
 
-    public CarritoAnadirView() {
-        super("Carrito de Compras", true, true, false, true);
+    public CarritoAnadirView(MensajeInternacionalizacionHandler mensajes) {
+        super("", true, true, false, true);
+        this.mensajes = mensajes;
+        this.locale = new Locale(mensajes.get("locale.lang"), mensajes.get("locale.country"));
+
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(500, 500);
+        setSize(600, 550);
+        setClosable(true);
+        setIconifiable(true);
+
         modelo = new DefaultTableModel();
-        Object[] columnas = {"Id", "Nombre", "Precio","cantidad","Subtotal"};
-        modelo.setColumnIdentifiers(columnas);
         tblItems.setModel(modelo);
+
         cargarDatos();
+        actualizarTextos();
     }
 
-
-    private void cargarDatos(){
+    private void cargarDatos() {
         cbxCantidad.removeAllItems();
         for (int i = 1; i <= 20; i++) {
             cbxCantidad.addItem(String.valueOf(i));
+        }
+    }
+
+    public void actualizarTextos() {
+        this.locale = new Locale(mensajes.get("locale.lang"), mensajes.get("locale.country"));
+
+        setTitle(mensajes.get("car.crear.titulo.app"));
+        if (panelPrincipal != null) {
+            Component[] components = panelPrincipal.getComponents();
+            for (Component c : components) {
+                if (c instanceof JLabel) {
+                    JLabel label = (JLabel) c;
+                    String name = label.getName();
+                    if (name != null) {
+                        switch (name) {
+                            case "lblTitulo" -> label.setText(mensajes.get("car.crear.titulo"));
+                            case "lblCodigo" -> label.setText(mensajes.get("global.codigo"));
+                            case "lblNombre" -> label.setText(mensajes.get("global.nombre"));
+                            case "lblPrecio" -> label.setText(mensajes.get("global.precio"));
+                            case "lblCantidad" -> label.setText(mensajes.get("global.cantidad"));
+                            case "lblSubtotal" -> label.setText(mensajes.get("global.subtotal"));
+                            case "lblIVA" -> label.setText(mensajes.get("global.iva"));
+                            case "lblTotal" -> label.setText(mensajes.get("global.total"));
+                        }
+                    }
+                }
+            }
+        }
+
+        txtCodigo.setToolTipText(mensajes.get("prod.top.codigo"));
+        btnBuscar.setText(mensajes.get("btn.buscar"));
+        btnAñadir.setText(mensajes.get("btn.añadir"));
+        btnGuardar.setText(mensajes.get("btn.guardar"));
+        btnLimpiar.setText(mensajes.get("btn.limpiar"));
+        cbxCantidad.setToolTipText(mensajes.get("car.top.cantidad"));
+
+        Object[] columnas = {
+                mensajes.get("global.codigo"),
+                mensajes.get("global.nombre"),
+                mensajes.get("global.precio"),
+                mensajes.get("global.cantidad"),
+                mensajes.get("global.subtotal")
+        };
+        modelo.setColumnIdentifiers(columnas);
+
+        mostrarCarrito(carritoActual);
+    }
+
+    public void mostrarCarrito(Carrito carrito) {
+        this.carritoActual = carrito;
+        modelo.setRowCount(0);
+        if (carrito != null) {
+            for (ItemCarrito item : carrito.obtenerItems()) {
+                modelo.addRow(new Object[]{
+                        item.getProducto().getCodigo(),
+                        item.getProducto().getNombre(),
+                        FormateadorUtils.formatearMoneda(item.getProducto().getPrecio(), locale),
+                        item.getCantidad(),
+                        FormateadorUtils.formatearMoneda(item.getSubtotal(), locale)
+                });
+            }
+            txtSubtotal.setText(FormateadorUtils.formatearMoneda(carrito.calcularSubtotal(), locale));
+            txtIVA.setText(FormateadorUtils.formatearMoneda(carrito.calcularIVA(), locale));
+            txtTotal.setText(FormateadorUtils.formatearMoneda(carrito.calcularTotal(), locale));
+        } else {
+            txtSubtotal.setText("");
+            txtIVA.setText("");
+            txtTotal.setText("");
         }
     }
 
@@ -122,11 +203,11 @@ public class CarritoAnadirView extends JInternalFrame {
         this.btnLimpiar = btnLimpiar;
     }
 
-    public JComboBox getCbxCantidad() {
+    public JComboBox<String> getCbxCantidad() {
         return cbxCantidad;
     }
 
-    public void setCbxCantidad(JComboBox cbxCantidad) {
+    public void setCbxCantidad(JComboBox<String> cbxCantidad) {
         this.cbxCantidad = cbxCantidad;
     }
 
@@ -134,11 +215,11 @@ public class CarritoAnadirView extends JInternalFrame {
         return tblItems;
     }
 
-    public void setTable1(JTable table1) {
-        this.tblItems = table1;
-    }
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+    public void setTblItems(JTable tblItems) {
+        this.tblItems = tblItems;
     }
 
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, mensajes.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
+    }
 }

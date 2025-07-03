@@ -2,12 +2,15 @@ package ec.edu.ups.vista.Carrito;
 
 import ec.edu.ups.modelo.Carrito;
 import ec.edu.ups.modelo.ItemCarrito;
+import ec.edu.ups.util.FormateadorUtils;
+import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import java.util.Locale;
 
 public class CarritoModificarView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -21,13 +24,18 @@ public class CarritoModificarView extends JInternalFrame {
     private JLabel lblFecha;
     private JLabel lblItems;
     private JButton btnModificar;
+    private JLabel lblTitulo;
     private DefaultTableModel modeloDetalles;
     private Carrito carritoActual;
+    private MensajeInternacionalizacionHandler mensaje;
+    private Locale locale;
 
-    public CarritoModificarView() {
-        super("Modificar Carrito", true, true, false, true);
+    public CarritoModificarView(MensajeInternacionalizacionHandler mensaje) {
+        super("", true, true, false, true);
+        this.mensaje = mensaje;
+        this.locale = new Locale(mensaje.get("locale.lang"), mensaje.get("locale.country"));
         setContentPane(panelPrincipal);
-        setSize(600, 400);
+        setSize(600, 600);
 
         modeloDetalles = new DefaultTableModel() {
             @Override
@@ -35,72 +43,43 @@ public class CarritoModificarView extends JInternalFrame {
                 return column == 3;
             }
         };
-
-        Object[] columnasDetalles = {"Cod. Producto", "Nombre", "Precio Unit.", "Cantidad", "Subtotal"};
-        modeloDetalles.setColumnIdentifiers(columnasDetalles);
         tblItems.setModel(modeloDetalles);
 
-        modeloDetalles.addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.UPDATE) {
-                    int row = e.getFirstRow();
-                    int column = e.getColumn();
-
-                    if (column == 3 && carritoActual != null) {
-                        int codigoProducto = (int) modeloDetalles.getValueAt(row, 0);
-                        int nuevaCantidad = Integer.parseInt(modeloDetalles.getValueAt(row, 3).toString());
-
-                        carritoActual.actualizarCantidadProducto(codigoProducto, nuevaCantidad);
-
-                        ItemCarrito itemActualizado = encontrarItem(codigoProducto);
-                        if (itemActualizado != null) {
-                            modeloDetalles.setValueAt(itemActualizado.getSubtotal(), row, 4);
-                        }
-
-                    }
-                }
-            }
-        });
+        configurarListeners();
+        actualizarTextos();
 
         btnModificar.setEnabled(false);
+
     }
 
-    private ItemCarrito encontrarItem(int codigoProducto) {
-        for (ItemCarrito item : carritoActual.obtenerItems()) {
-            if (item.getProducto().getCodigo() == codigoProducto) {
-                return item;
-            }
-        }
-        return null;
+    public void actualizarTextos() {
+        this.locale = new Locale(mensaje.get("locale.lang"), mensaje.get("locale.country"));
+
+        setTitle(mensaje.get("usr.modificar.titulo.app"));
+        lblTitulo.setText(mensaje.get("usr.modificar.titulo.app"));
+        lblCodigo.setText(mensaje.get("global.codigo"));
+        lblUsuario.setText(mensaje.get("global.usuario"));
+        lblFecha.setText(mensaje.get("global.fecha"));
+        lblItems.setText(mensaje.get("global.item"));
+
+        txtCodigo.setToolTipText(mensaje.get("car.top.codigo"));
+
+        btnModificar.setText(mensaje.get("btn.modificar"));
+        btnBuscar.setText(mensaje.get("btn.buscar"));
+
+        Object[] columnas = {
+                mensaje.get("global.codigo"),
+                mensaje.get("global.nombre"),
+                mensaje.get("global.precio"),
+                mensaje.get("global.cantidad"),
+                mensaje.get("global.subtotal")
+        };
+        modeloDetalles.setColumnIdentifiers(columnas);
+        mostrarItemsCarrito(carritoActual);
     }
-
-    public JPanel getPanelPrincipal() { return panelPrincipal; }
-    public void setPanelPrincipal(JPanel panelPrincipal) { this.panelPrincipal = panelPrincipal; }
-    public JTextField getTxtCodigo() { return txtCodigo; }
-    public void setTxtCodigo(JTextField txtCodigo) { this.txtCodigo = txtCodigo; }
-    public JButton getBtnBuscar() { return btnBuscar; }
-    public void setBtnBuscar(JButton btnBuscar) { this.btnBuscar = btnBuscar; }
-    public JTextField getTxtUsuario() { return txtUsuario; }
-    public void setTxtUsuario(JTextField txtUsuario) { this.txtUsuario = txtUsuario; }
-    public JTextField getTxtFecha() { return txtFecha; }
-    public void setTxtFecha(JTextField txtFecha) { this.txtFecha = txtFecha; }
-    public JTable getTblItems() { return tblItems; }
-    public void setTblItems(JTable tblItems) { this.tblItems = tblItems; }
-    public JLabel getLblCodigo() { return lblCodigo; }
-    public void setLblCodigo(JLabel lblCodigo) { this.lblCodigo = lblCodigo; }
-    public JLabel getLblUsuario() { return lblUsuario; }
-    public void setLblUsuario(JLabel lblUsuario) { this.lblUsuario = lblUsuario; }
-    public JLabel getLblFecha() { return lblFecha; }
-    public void setLblFecha(JLabel lblFecha) { this.lblFecha = lblFecha; }
-    public JLabel getLblItems() { return lblItems; }
-    public void setLblItems(JLabel lblItems) { this.lblItems = lblItems; }
-    public JButton getBtnModificar() { return btnModificar; }
-    public void setBtnModificar(JButton btnModificar) { this.btnModificar = btnModificar; }
-
 
     public void mostrarItemsCarrito(Carrito carrito) {
-        this.carritoActual = carrito; // Guardar la referencia al carrito
+        this.carritoActual = carrito;
         modeloDetalles.setRowCount(0);
 
         if (carrito != null) {
@@ -109,16 +88,56 @@ public class CarritoModificarView extends JInternalFrame {
                 Object[] fila = {
                         item.getProducto().getCodigo(),
                         item.getProducto().getNombre(),
-                        item.getProducto().getPrecio(),
+                        FormateadorUtils.formatearMoneda(item.getProducto().getPrecio(), locale),
                         item.getCantidad(),
-                        item.getSubtotal()
+                        FormateadorUtils.formatearMoneda(item.getSubtotal(), locale)
                 };
                 modeloDetalles.addRow(fila);
             }
         }
     }
 
-    public void mostrarMensaje(String s) {
-        JOptionPane.showMessageDialog(this, s, "Información", JOptionPane.INFORMATION_MESSAGE);
+    private void configurarListeners() {
+        modeloDetalles.addTableModelListener(e -> {
+            if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 3) {
+                actualizarSubtotalF(e.getFirstRow());
+            }
+        });
+    }
+
+    private void actualizarSubtotalF(int fila) {
+        if (carritoActual != null) {
+            try {
+                int codigoProducto = (int) modeloDetalles.getValueAt(fila, 0);
+                int nuevaCantidad = Integer.parseInt(modeloDetalles.getValueAt(fila, 3).toString());
+
+                carritoActual.actualizarCantidadProducto(codigoProducto, nuevaCantidad);
+
+                ItemCarrito itemActualizado = encontrarItem(codigoProducto);
+                if (itemActualizado != null) {
+                    modeloDetalles.setValueAt(
+                            FormateadorUtils.formatearMoneda(itemActualizado.getSubtotal(), locale),
+                            fila, 4);
+                }
+            } catch (NumberFormatException ex) {
+                mostrarMensaje(mensaje.get("mensaje.carrito.cantidadInvalida"));
+            }
+        }
+    }
+
+    private ItemCarrito encontrarItem(int codigoProducto) {
+        if (carritoActual == null) return null;
+        for (ItemCarrito item : carritoActual.obtenerItems()) {
+            if (item.getProducto().getCodigo() == codigoProducto) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public void mostrarMensaje(String mensajes) {
+        JOptionPane.showMessageDialog(this, mensajes, mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
     }
 }
+
+

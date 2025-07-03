@@ -1,10 +1,13 @@
 package ec.edu.ups.vista.Usuario;
 
+import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
+import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import java.util.Locale;
 
 public class UsuarioListarView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -15,37 +18,61 @@ public class UsuarioListarView extends JInternalFrame {
     private JButton btnBuscar;
     private DefaultTableModel tableModel;
 
-    public UsuarioListarView() {
-        super("Listado de Usuarios", true, true, false, true);
+    private MensajeInternacionalizacionHandler mensaje;
+    private Locale locale;
+    private List<Usuario> listaActual;
+
+    public UsuarioListarView(MensajeInternacionalizacionHandler mensaje) {
+        super("", true, true, false, true);
+        this.mensaje = mensaje;
+
         setContentPane(panelPrincipal);
         setSize(600, 400);
 
-        lblListado.setText("Gestión de Usuarios");
-        btnListar.setText("Listar Todos");
-        btnBuscar.setText("Buscar");
-        txtUsuario.setToolTipText("Ingrese el username a buscar");
-
         configurarTabla();
+        actualizarTextos();
     }
 
     private void configurarTabla() {
         tableModel = new DefaultTableModel();
-        tableModel.setColumnIdentifiers(new Object[]{"Username", "Rol"});
         tblUsuarios.setModel(tableModel);
     }
 
+    public void actualizarTextos() {
+        this.locale = new Locale(mensaje.get("locale.lang"), mensaje.get("locale.country"));
+        setTitle(mensaje.get("usr.listar.titulo.app"));
+        lblListado.setText(mensaje.get("menu.usr.listar"));
+        btnListar.setText(mensaje.get("menu.usr.listar"));
+        btnBuscar.setText(mensaje.get("btn.buscar"));
+        txtUsuario.setToolTipText(mensaje.get("msg.usr.buscarUsername.vacio"));
+
+        tableModel.setColumnIdentifiers(new Object[]{
+                mensaje.get("global.usuario"),
+                mensaje.get("global.rol")
+        });
+
+        mostrarUsuarios(listaActual);
+    }
 
     public void mostrarUsuarios(List<Usuario> usuarios) {
+        this.listaActual = usuarios;
         tableModel.setRowCount(0);
+        if (usuarios == null) return;
 
         for (Usuario usuario : usuarios) {
+            String rolTraducido = "";
+            if (usuario.getRol() == Rol.ADMINISTRADOR) {
+                rolTraducido = mensaje.get("global.rol.admin");
+            } else if (usuario.getRol() == Rol.USUARIO) {
+                rolTraducido = mensaje.get("global.rol.user");
+            }
+
             tableModel.addRow(new Object[]{
                     usuario.getUsername(),
-                    usuario.getRol().toString()
+                    rolTraducido
             });
         }
     }
-
 
     public JButton getBtnListar() {
         return btnListar;
@@ -59,7 +86,7 @@ public class UsuarioListarView extends JInternalFrame {
         return txtUsuario;
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+    public void mostrarMensaje(String msg) {
+        JOptionPane.showMessageDialog(this, msg, mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
     }
 }

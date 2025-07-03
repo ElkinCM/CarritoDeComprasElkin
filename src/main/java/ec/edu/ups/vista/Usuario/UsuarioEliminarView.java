@@ -1,6 +1,9 @@
 package ec.edu.ups.vista.Usuario;
 
+import ec.edu.ups.util.MensajeInternacionalizacionHandler;
+
 import javax.swing.*;
+import java.net.URL;
 
 public class UsuarioEliminarView extends JInternalFrame {
     private JLabel lblUsuario;
@@ -14,10 +17,36 @@ public class UsuarioEliminarView extends JInternalFrame {
     private JPanel paneltitulo;
     private JPanel panelPrincipal;
 
-    public UsuarioEliminarView(){
-        super("",true,true,false,true);
-        setSize(600,400);
+    private MensajeInternacionalizacionHandler mensaje;
+
+    public UsuarioEliminarView(MensajeInternacionalizacionHandler mensaje) {
+        super("", true, true, false, true);
+        this.mensaje = mensaje;
+
+        setSize(600, 400);
         setContentPane(panelPrincipal);
+
+        // Aquí puedes cargar íconos si cuentas con ellos
+        URL urlBuscar = getClass().getResource("/search.png");
+        if (urlBuscar != null) {
+            btnBuscar.setIcon(new ImageIcon(urlBuscar));
+        }
+        URL urlEliminar = getClass().getResource("/trash.png");
+        if (urlEliminar != null) {
+            btnEliminar.setIcon(new ImageIcon(urlEliminar));
+        }
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(mensaje.get("usr.eliminar.titulo.app"));
+        lblUsuario.setText(mensaje.get("global.usuario") + ":");
+        lblContraseña.setText(mensaje.get("global.pass") + ":");
+        lblRol.setText(mensaje.get("global.rol") + ":");
+        txtUsuario.setToolTipText(mensaje.get("usr.crear.nombre"));
+        btnBuscar.setText(mensaje.get("btn.buscar"));
+        btnEliminar.setText(mensaje.get("btn.eliminar"));
     }
 
     public JLabel getLblUsuario() {
@@ -100,15 +129,17 @@ public class UsuarioEliminarView extends JInternalFrame {
         this.panelPrincipal = panelPrincipal;
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+    public void mostrarMensaje(String mensajes) {
+        JOptionPane.showMessageDialog(this, mensajes, mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void limpiarCampos() {
         txtUsuario.setText("");
         txtContraseña.setText("");
+        txtRol.setText("");
         btnEliminar.setEnabled(false);
         txtContraseña.setEnabled(false);
+        txtRol.setEnabled(false);
         txtUsuario.setEditable(true);
         btnBuscar.setEnabled(true);
     }

@@ -2,10 +2,14 @@ package ec.edu.ups.vista.Carrito;
 
 import ec.edu.ups.modelo.Carrito;
 import ec.edu.ups.modelo.ItemCarrito;
+import ec.edu.ups.util.FormateadorUtils;
+import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 
 public class CarritoEliminarView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -19,127 +23,77 @@ public class CarritoEliminarView extends JInternalFrame {
     private JLabel lblUsuario;
     private JLabel lblFecha;
     private JLabel lblItems;
+    private JLabel lblTitulo;
     private DefaultTableModel modeloDetalles;
     private Carrito carritoActual;
 
-    public CarritoEliminarView() {
+    private MensajeInternacionalizacionHandler mensajes;
+    private Locale locale;
+
+    public CarritoEliminarView(MensajeInternacionalizacionHandler mensajes) {
         super("", true, true, false, true);
+        this.mensajes = mensajes;
+        this.locale = new Locale(mensajes.get("locale.lang"), mensajes.get("locale.country"));
+
+        URL urlBuscar = getClass().getResource("/search.png");
+        URL urlEliminar = getClass().getResource("/trash.png");
+
         setContentPane(panelPrincipal);
+
+        if (btnBuscar != null && urlBuscar != null)
+            btnBuscar.setIcon(new ImageIcon(urlBuscar));
+        if (btnEliminar != null && urlEliminar != null)
+            btnEliminar.setIcon(new ImageIcon(urlEliminar));
+
         setSize(600, 400);
+
         modeloDetalles = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 3;
+                return false;
             }
         };
 
-        Object[] columnasDetalles = {"Cod. Producto", "Nombre", "Precio Unit.", "Cantidad", "Subtotal"};
+        if (tblItems != null)
+            tblItems.setModel(modeloDetalles);
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        this.locale = new Locale(mensajes.get("locale.lang"), mensajes.get("locale.country"));
+
+        setTitle(mensajes.get("car.eliminar.titulo.app"));
+
+        if (lblTitulo != null)
+            lblTitulo.setText(mensajes.get("car.eliminar.titulo.app"));
+        if (lblCodigo != null)
+            lblCodigo.setText(mensajes.get("global.codigo"));
+        if (lblUsuario != null)
+            lblUsuario.setText(mensajes.get("global.usuario"));
+        if (lblFecha != null)
+            lblFecha.setText(mensajes.get("global.fecha"));
+        if (lblItems != null)
+            lblItems.setText(mensajes.get("global.item"));
+
+        if (txtCodigo != null)
+            txtCodigo.setToolTipText(mensajes.get("car.top.codigo"));
+
+        if (btnBuscar != null)
+            btnBuscar.setText(mensajes.get("btn.buscar"));
+        if (btnEliminar != null)
+            btnEliminar.setText(mensajes.get("btn.eliminar"));
+
+        Object[] columnasDetalles = {
+                mensajes.get("global.codigo"),
+                mensajes.get("global.nombre"),
+                mensajes.get("global.precio"),
+                mensajes.get("global.cantidad"),
+                mensajes.get("global.subtotal")
+        };
         modeloDetalles.setColumnIdentifiers(columnasDetalles);
-        tblItems.setModel(modeloDetalles);
-    }
 
-    public JPanel getPanelPrincipal() {
-        return panelPrincipal;
-    }
-
-    public void setPanelPrincipal(JPanel panelPrincipal) {
-        this.panelPrincipal = panelPrincipal;
-    }
-
-    public JTextField getTxtCodigo() {
-        return txtCodigo;
-    }
-
-    public void setTxtCodigo(JTextField txtCodigo) {
-        this.txtCodigo = txtCodigo;
-    }
-
-    public JButton getBtnBuscar() {
-        return btnBuscar;
-    }
-
-    public void setBtnBuscar(JButton btnBuscar) {
-        this.btnBuscar = btnBuscar;
-    }
-
-    public JTable getTblItems() {
-        return tblItems;
-    }
-
-    public void setTblItems(JTable tblItems) {
-        this.tblItems = tblItems;
-    }
-
-    public JTextField getTxtUsuario() {
-        return txtUsuario;
-    }
-
-    public void setTxtUsuario(JTextField txtUsuario) {
-        this.txtUsuario = txtUsuario;
-    }
-
-    public JTextField getTxtFecha() {
-        return txtFecha;
-    }
-
-    public void setTxtFecha(JTextField txtFecha) {
-        this.txtFecha = txtFecha;
-    }
-
-    public JButton getBtnEliminar() {
-        return btnEliminar;
-    }
-
-    public void setBtnEliminar(JButton btnEliminar) {
-        this.btnEliminar = btnEliminar;
-    }
-
-    public JLabel getLblCodigo() {
-        return lblCodigo;
-    }
-
-    public void setLblCodigo(JLabel lblCodigo) {
-        this.lblCodigo = lblCodigo;
-    }
-
-    public JLabel getLblUsuario() {
-        return lblUsuario;
-    }
-
-    public void setLblUsuario(JLabel lblUsuario) {
-        this.lblUsuario = lblUsuario;
-    }
-
-    public JLabel getLblFecha() {
-        return lblFecha;
-    }
-
-    public void setLblFecha(JLabel lblFecha) {
-        this.lblFecha = lblFecha;
-    }
-
-    public JLabel getLblItems() {
-        return lblItems;
-    }
-
-    public void setLblItems(JLabel lblItems) {
-        this.lblItems = lblItems;
-    }
-
-    public DefaultTableModel getModeloDetalles() {
-        return modeloDetalles;
-    }
-
-    public void setModeloDetalles(DefaultTableModel modeloDetalles) {
-        this.modeloDetalles = modeloDetalles;
-    }
-
-    public Carrito getCarritoActual() {
-        return carritoActual;
-    }
-
-    public void setCarritoActual(Carrito carritoActual) {
-        this.carritoActual = carritoActual;
+        mostrarItemsCarrito(carritoActual);
     }
 
     public void mostrarItemsCarrito(Carrito carrito) {
@@ -152,16 +106,50 @@ public class CarritoEliminarView extends JInternalFrame {
                 Object[] fila = {
                         item.getProducto().getCodigo(),
                         item.getProducto().getNombre(),
-                        item.getProducto().getPrecio(),
+                        FormateadorUtils.formatearMoneda(item.getProducto().getPrecio(), locale),
                         item.getCantidad(),
-                        item.getSubtotal()
+                        FormateadorUtils.formatearMoneda(item.getSubtotal(), locale)
                 };
                 modeloDetalles.addRow(fila);
             }
         }
     }
 
-    public void mostrarMensaje(String s) {
-        JOptionPane.showMessageDialog(this, s, "Información", JOptionPane.INFORMATION_MESSAGE);
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, mensajes.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // Getters y setters para los componentes que usarás en controlador:
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
+
+    public JTextField getTxtCodigo() {
+        return txtCodigo;
+    }
+
+    public JButton getBtnBuscar() {
+        return btnBuscar;
+    }
+
+    public JTable getTblItems() {
+        return tblItems;
+    }
+
+    public JTextField getTxtUsuario() {
+        return txtUsuario;
+    }
+
+    public JTextField getTxtFecha() {
+        return txtFecha;
+    }
+
+    public JButton getBtnEliminar() {
+        return btnEliminar;
+    }
+
+    public Carrito getCarritoActual() {
+        return carritoActual;
     }
 }
