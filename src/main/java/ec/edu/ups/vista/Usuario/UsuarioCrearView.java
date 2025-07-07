@@ -38,7 +38,7 @@ public class UsuarioCrearView extends JInternalFrame {
         super(internacionalizar.get("usuario.crear.menu"), true, true, true, true);
         this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
-        setSize(800, 500);
+        setSize(400, 450);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setFrameIcon(new ImageIcon(getClass().getResource("/usuario_crear.png")));
         btnCrear.setIcon(new ImageIcon(getClass().getResource("/crear.png")));

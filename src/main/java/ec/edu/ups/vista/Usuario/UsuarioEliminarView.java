@@ -35,7 +35,7 @@ public class UsuarioEliminarView extends JInternalFrame {
     public UsuarioEliminarView(MensajeInternacionalizacionHandler internacionalizar) {
         super(internacionalizar.get("usuario.eliminar.menu"), true, true, true, true);
         this.Internacionalizar = internacionalizar;
-        setSize(500, 500);
+        setSize(400, 450);
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
         setFrameIcon(new ImageIcon(getClass().getResource("/usuario_eliminar.png")));

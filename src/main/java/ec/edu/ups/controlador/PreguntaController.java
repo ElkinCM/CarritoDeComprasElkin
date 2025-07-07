@@ -185,6 +185,14 @@ public class PreguntaController {
     private void configurarEventosEnOlvidada() {
         Usuario usuarioRecuperacion = usuarioDAO.buscarPorUsuario(loginView.getTxtUsername().getText());
         List<RespuestaSegu> preguntas = usuarioRecuperacion.getRespuestaSegu();
+
+        if (preguntas == null || preguntas.isEmpty()) {
+            recuperarView.mostrarMensaje(Internacionalizar.get("recuperacion.sin.preguntas"));
+            loginView.setVisible(true);
+            recuperarView.dispose();
+            return;
+        }
+
         randomizarListaPreguntaRespondida(preguntas);
         List<Integer> codigos = new ArrayList<>();
         List<String> respuestas = new ArrayList<>();
@@ -192,8 +200,10 @@ public class PreguntaController {
             codigos.add(preguntaRespondida.getPregunta().getId());
             respuestas.add(preguntaRespondida.getRespuesta());
         }
+
         final int[] iteradorCodigo = {0};
         final int[] correctas = {0};
+
         cargarPreguntaOlvidada(codigos.get(iteradorCodigo[0]));
 
         quitarActionListeners(recuperarView.getBtnRestablecer());

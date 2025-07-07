@@ -26,7 +26,7 @@ public class RecuperarView extends JFrame {
         this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
+        setSize(300, 200);
         setLocationRelativeTo(null);
         setResizable(false);
 

@@ -27,7 +27,7 @@ public class UsuarioListarView extends JInternalFrame {
         super(internacionalizar.get("usuario.listar.menu"), true, true, true, true);
         this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
-        setSize(600, 400);
+        setSize(400, 450);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         setFrameIcon(new ImageIcon(getClass().getResource("/usuario_listar.png")));

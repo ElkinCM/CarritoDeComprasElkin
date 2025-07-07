@@ -38,7 +38,7 @@ public class UsuarioModificarView extends JInternalFrame {
         this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(600,400);
+        setSize(400,450);
 
         setFrameIcon(new ImageIcon(getClass().getResource("/modificar.png")));
         btnBuscar.setIcon(new ImageIcon(getClass().getResource("/buscar.png")));

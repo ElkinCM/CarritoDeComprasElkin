@@ -28,7 +28,7 @@ public class ProductoAnadirView extends JInternalFrame {
         this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(500, 500);
+        setSize(400, 200);
 
         setFrameIcon(new ImageIcon(getClass().getResource("/crear.png")));
         btnAceptar.setIcon(new ImageIcon(getClass().getResource("/aceptar.png")));

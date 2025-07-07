@@ -41,6 +41,7 @@ public class CarritoModificarView extends JInternalFrame {
         setSize(500,500);
         setFrameIcon(new ImageIcon(getClass().getResource("/carrito.png")));
         modelo = new DefaultTableModel();
+        tblItems.setModel(modelo);
 
         btnBuscar.setIcon(new ImageIcon(getClass().getResource("/buscar.png")));
         btnAnadir.setIcon(new ImageIcon(getClass().getResource("/crear.png")));

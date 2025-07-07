@@ -34,7 +34,7 @@ public class LoginView extends JFrame {
         setTitle(internacionalizar.get("login.app.menu"));
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(500,300);
         setLocationRelativeTo(null);
         setResizable(false);
 

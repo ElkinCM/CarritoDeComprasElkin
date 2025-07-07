@@ -98,8 +98,17 @@ public class UsuarioController {
         usuarioCrearView.getBtnCrear().addActionListener(e -> {
             String usuario = usuarioCrearView.getTxtUsuario().getText().trim();
             String contrasenia = usuarioCrearView.getTxtContraseña().getText().trim();
+            String nombre = usuarioCrearView.getTxtNombre().getText().trim();
+            String correo = usuarioCrearView.getTxtCorreo().getText().trim();
+            String telefono = usuarioCrearView.getTxtTelefono().getText().trim();
+            String anioStr = usuarioCrearView.getTxtAnio().getText().trim();
 
-            if (usuario.isEmpty() || contrasenia.isEmpty()) {
+            Object diaObj = usuarioCrearView.getCbxDia().getSelectedItem();
+            Object mesObj = usuarioCrearView.getCbxMes().getSelectedItem();
+
+            if (usuario.isEmpty() || contrasenia.isEmpty() || nombre.isEmpty()
+                    || correo.isEmpty() || telefono.isEmpty() || anioStr.isEmpty()
+                    || diaObj == null || mesObj == null) {
                 usuarioCrearView.mostrarMensaje(Internacionalizar.get("mensaje.completar.campos"));
                 return;
             }
@@ -110,21 +119,60 @@ public class UsuarioController {
                 return;
             }
 
+            int dia = (int) diaObj;
+            int anio;
+            try {
+                anio = Integer.parseInt(anioStr);
+            } catch (NumberFormatException ex) {
+                usuarioCrearView.mostrarMensaje("Año inválido.");
+                return;
+            }
+
+            String mesStr = mesObj.toString();
+            int mes = convertirMesAInt(mesStr);
+
+            GregorianCalendar fechaNacimiento = new GregorianCalendar(anio, mes, dia);
+
             Usuario nuevo = new Usuario();
             nuevo.setUsername(usuario);
             nuevo.setContrasenia(contrasenia);
+            nuevo.setNombre(nombre);
+            nuevo.setCorreo(correo);
+            nuevo.setTelefono(telefono);
+            nuevo.setFechaNacimiento(fechaNacimiento);
             nuevo.setRol(Rol.USUARIO);
 
             usuarioDAO.crear(nuevo);
             usuarioCrearView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.creado"));
             usuarioCrearView.vaciarCampo();
         });
+
         usuarioCrearView.getBtnSalir().addActionListener(e -> {
             if (usuarioCrearView.isVisible()) {
                 usuarioCrearView.setVisible(false);
             }
         });
     }
+
+    private int convertirMesAInt(String mes) {
+        mes = mes.toLowerCase();
+        switch (mes) {
+            case "enero": return 0;
+            case "febrero": return 1;
+            case "marzo": return 2;
+            case "abril": return 3;
+            case "mayo": return 4;
+            case "junio": return 5;
+            case "julio": return 6;
+            case "agosto": return 7;
+            case "septiembre": return 8;
+            case "octubre": return 9;
+            case "noviembre": return 10;
+            case "diciembre": return 11;
+            default: return 0; // También puedes lanzar una excepción si prefieres
+        }
+    }
+
 
     private void configurarModificarUsu() {
         if (usuario.getRol() == Rol.USUARIO) {

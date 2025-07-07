@@ -59,7 +59,7 @@ public class RegistrarView extends JFrame {
         super(internacionalizar.get("registrarse.app.menu"));
         this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
-        setSize(600, 600);
+        setSize(400, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -197,4 +197,7 @@ public class RegistrarView extends JFrame {
     public JMenuItem getMenuItemIngles(){return menuItemIngles;}
     public JMenuItem getMenuItemFrances(){return menuItemFrances;}
 
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }

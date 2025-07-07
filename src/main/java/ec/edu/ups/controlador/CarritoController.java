@@ -42,6 +42,8 @@ public class CarritoController {
         this.carritoListarView = carritoListarView;
         this.carritoListarMisItemsView = carritoListarMisItemsView;
 
+        this.carrito = new Carrito(usuario);
+
         configurarAnadirCa();
         configurarModificarCa();
         configurarEliminarCa();

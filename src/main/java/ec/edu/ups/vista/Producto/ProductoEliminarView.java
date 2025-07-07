@@ -27,7 +27,7 @@ public class ProductoEliminarView extends JInternalFrame {
         super(internacionalizar.get("producto.eliminar.menu"),true,true,false,true);
         Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
-        setSize(500,500);
+        setSize(300,200);
 
         setFrameIcon(new ImageIcon(getClass().getResource("/eliminar.png")));
         btnEliminar.setIcon(new ImageIcon(getClass().getResource("/eliminar.png")));
