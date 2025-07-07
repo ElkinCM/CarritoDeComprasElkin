@@ -1,13 +1,11 @@
 package ec.edu.ups.vista.Producto;
 
-import ec.edu.ups.modelo.Producto;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
-import java.util.List;
+import java.util.Locale;
 
 public class ProductoAnadirView extends JInternalFrame {
 
@@ -22,52 +20,39 @@ public class ProductoAnadirView extends JInternalFrame {
     private JLabel lblPrecio;
     private JLabel lblTitulo;
 
-    private MensajeInternacionalizacionHandler mensaje;
+    private MensajeInternacionalizacionHandler Internacionalizar;
+    private Locale locale;
 
-    public ProductoAnadirView(MensajeInternacionalizacionHandler mensaje) {
-        super(mensaje.get("prod.crear.titulo.app"), true, true, true, true);
-        this.mensaje = mensaje;
-
-        URL urlAceptar = getClass().getResource("/check.png");
-        URL urlLimpiar = getClass().getResource("/clean.png");
-
-        if (urlAceptar != null) {
-            btnAceptar.setIcon(new ImageIcon(urlAceptar));
-        }
-
-        if (urlLimpiar != null) {
-            btnLimpiar.setIcon(new ImageIcon(urlLimpiar));
-        }
-
+    public ProductoAnadirView(MensajeInternacionalizacionHandler internacionalizar) {
+        super(internacionalizar.get("producto.anadir.menu"), true, true, true, true);
+        this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
-        actualizarTextos();
-
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(500, 500);
-        setClosable(true);
-        setIconifiable(true);
-        setResizable(true);
+
+        setFrameIcon(new ImageIcon(getClass().getResource("/crear.png")));
+        btnAceptar.setIcon(new ImageIcon(getClass().getResource("/aceptar.png")));
+        btnLimpiar.setIcon(new ImageIcon(getClass().getResource("/limpiar.png")));
 
         btnLimpiar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                limpiarCampos();
+                vaciarCampo();
             }
         });
+
+        actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
 
-    public void actualizarTextos() {
-        setTitle(mensaje.get("prod.crear.titulo.app"));
-        lblTitulo.setText(mensaje.get("prod.crear.titulo"));
-        lblCodigo.setText(mensaje.get("global.codigo"));
-        lblNombre.setText(mensaje.get("global.nombre"));
-        lblPrecio.setText(mensaje.get("global.precio"));
+    public void actualizarIdioma(String language, String country) {
+        Internacionalizar.setLenguaje(language, country);
+        lblTitulo.setText(Internacionalizar.get("producto.anadir.titulo"));
+        lblCodigo.setText(Internacionalizar.get("etiqueta.codigo"));
+        lblNombre.setText(Internacionalizar.get("etiqueta.nombre"));
+        lblPrecio.setText(Internacionalizar.get("etiqueta.precio"));
 
-        txtCodigo.setToolTipText(mensaje.get("prod.top.codigo"));
-        txtNombre.setToolTipText(mensaje.get("prod.top.nombre"));
-        txtPrecio.setToolTipText(mensaje.get("prod.top.precio"));
-
-        btnAceptar.setText(mensaje.get("btn.aceptar"));
-        btnLimpiar.setText(mensaje.get("btn.limpiar"));
+        btnAceptar.setText(Internacionalizar.get("boton.aceptar"));
+        btnLimpiar.setText(Internacionalizar.get("boton.limpiar"));
     }
 
     public JPanel getPanelPrincipal() {
@@ -119,18 +104,13 @@ public class ProductoAnadirView extends JInternalFrame {
     }
 
     public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, this.mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, mensaje);
     }
 
-    public void limpiarCampos() {
+    public void vaciarCampo() {
         txtCodigo.setText("");
         txtNombre.setText("");
         txtPrecio.setText("");
     }
-
-    public void mostrarProductos(List<Producto> productos) {
-        for (Producto producto : productos) {
-            System.out.println(producto);
-        }
-    }
 }
+

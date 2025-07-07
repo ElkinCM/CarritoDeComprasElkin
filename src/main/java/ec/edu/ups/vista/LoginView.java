@@ -3,6 +3,9 @@ package ec.edu.ups.vista;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Locale;
 
 public class LoginView extends JFrame {
     private JPanel panelPrincipal;
@@ -15,70 +18,117 @@ public class LoginView extends JFrame {
     private JLabel lblUsuario;
     private JLabel lblContraseña;
     private JLabel lblTitulo;
+    private JButton btnSalir;
 
-    private final MensajeInternacionalizacionHandler mensaje;
+    private JMenuBar menuBar;
+    private JMenu menuIdiomas;
+    private JMenuItem menuItemEspañol;
+    private JMenuItem menuItemIngles;
+    private JMenuItem menuItemFrances;
 
-    public LoginView(MensajeInternacionalizacionHandler mensaje) {
-        this.mensaje = mensaje;
+    private final MensajeInternacionalizacionHandler Internacionalizar;
+    private Locale locale;
+
+    public LoginView(MensajeInternacionalizacionHandler internacionalizar) {
+        this.Internacionalizar = internacionalizar;
+        setTitle(internacionalizar.get("login.app.menu"));
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 500);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setResizable(false);
-        
-        actualizarTexto();
+
+        btnRegistrarse.setIcon(new ImageIcon(getClass().getResource("/crear.png")));
+        btnIniciarSesion.setIcon(new ImageIcon(getClass().getResource("/iniciarSesion.png")));
+        btnSalir.setIcon(new ImageIcon(getClass().getResource("/salir.png")));
+
+        btnSalir.addActionListener(e -> dispose());
+
+        menuBar = new JMenuBar();
+        menuIdiomas = new JMenu(internacionalizar.get("idiomas.menu"));
+        menuIdiomas.setIcon(new ImageIcon(getClass().getResource("/idioma.png")));
+
+        menuItemEspañol = new JMenuItem(internacionalizar.get("etiqueta.idioma.Español"));
+        menuItemIngles = new JMenuItem(internacionalizar.get("etiqueta.idioma.Ingles"));
+        menuItemFrances = new JMenuItem(internacionalizar.get("etiqueta.idioma.Frances"));
+
+        menuIdiomas.add(menuItemEspañol);
+        menuIdiomas.add(menuItemIngles);
+        menuIdiomas.add(menuItemFrances);
+        menuBar.add(menuIdiomas);
+        setJMenuBar(menuBar);
+
+        menuItemEspañol.addActionListener(e -> {
+            Internacionalizar.setLenguaje("es", "EC");
+            actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
+        });
+
+        menuItemIngles.addActionListener(e -> {
+            Internacionalizar.setLenguaje("en", "US");
+            actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
+        });
+
+        menuItemFrances.addActionListener(e -> {
+            Internacionalizar.setLenguaje("fr", "FR");
+            actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
+        });
+
+        actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
 
-    private void actualizarTexto() {
-        setTitle(mensaje.get("login.app.titulo"));
-        lblUsuario.setText(mensaje.get("global.usuario"));
-        lblContraseña.setText(mensaje.get("global.pass"));
-        btnIniciarSesion.setText(mensaje.get("login.app.titulo"));
-        btnRegistrarse.setText(mensaje.get("login.btn.reg"));
-        btnOlvidoContraseña.setText(mensaje.get("login.app.olvido"));
+    public void actualizarIdioma(String language, String country) {
+        Internacionalizar.setLenguaje(language, country);
+        lblTitulo.setText(Internacionalizar.get("login.app.titulo"));
+        lblUsuario.setText(Internacionalizar.get("etiqueta.usuario"));
+        lblContraseña.setText(Internacionalizar.get("etiqueta.contrasenia"));
+        btnIniciarSesion.setText(Internacionalizar.get("boton.iniciar.sesion"));
+        btnRegistrarse.setText(Internacionalizar.get("boton.registrarse"));
+        btnOlvidoContraseña.setText(Internacionalizar.get("boton.contraseña.olvidada"));
+        btnSalir.setText(Internacionalizar.get("boton.salir"));
+        menuIdiomas.setText(Internacionalizar.get("idiomas.menu"));
+        menuItemEspañol.setText(Internacionalizar.get("etiqueta.idioma.Español"));
+        menuItemIngles.setText(Internacionalizar.get("etiqueta.idioma.Ingles"));
+        menuItemFrances.setText(Internacionalizar.get("etiqueta.idioma.Frances"));
     }
 
     public JTextField getTxtUsername() {
         return txtUsername;
     }
 
-    public void setTxtUsername(JTextField txtUsername) {
-        this.txtUsername = txtUsername;
-    }
-
     public JPasswordField getPsfContraseña() {
         return psfContraseña;
-    }
-
-    public void setPsfContraseña(JPasswordField psfContraseña) {
-        this.psfContraseña = psfContraseña;
     }
 
     public JButton getBtnIniciarSesion() {
         return btnIniciarSesion;
     }
 
-    public void setBtnIniciarSesion(JButton btnIniciarSesion) {
-        this.btnIniciarSesion = btnIniciarSesion;
-    }
-
     public JButton getBtnRegistrarse() {
         return btnRegistrarse;
     }
 
-    public void setBtnRegistrarse(JButton btnRegistrarse) {
-        this.btnRegistrarse = btnRegistrarse;
+    public JButton getBtnSalir() {
+        return btnSalir;
     }
 
     public JButton getBtnOlvidoContraseña() {
         return btnOlvidoContraseña;
     }
 
-    public void setBtnOlvidoContraseña(JButton btnOlvidoContraseña) {
-        this.btnOlvidoContraseña = btnOlvidoContraseña;
+    public JMenuItem getMenuItemEspañol() {
+        return menuItemEspañol;
     }
 
-    public void mostrarMensaje(String mensajes) {
-        JOptionPane.showMessageDialog(this, mensajes, mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
+    public JMenuItem getMenuItemIngles() {
+        return menuItemIngles;
+
+    }
+
+    public JMenuItem getMenuItemFrances() {
+        return menuItemFrances;
+    }
+
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
     }
 }

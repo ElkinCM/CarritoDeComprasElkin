@@ -15,8 +15,10 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
     public UsuarioDAOMemoria() {
         usuarios = new ArrayList<>();
         // Usuarios por defecto
-        crear(new Usuario("admin", Rol.ADMINISTRADOR, "12345"));
-        crear(new Usuario("usuario", Rol.USUARIO, "12345"));
+// Usar constructor completo o crear uno específico para username, rol y contrasenia
+        crear(new Usuario("admin", Rol.ADMINISTRADOR, "12345", "Administrador", "admin@dominio.com", "1234567890", null));
+        crear(new Usuario("usuario", Rol.USUARIO, "12345", "Usuario", "usuario@dominio.com", "0987654321", null));
+
     }
 
     @Override

@@ -1,42 +1,36 @@
 package ec.edu.ups.modelo;
 
 public class RespuestaSegu {
-    private Pregunta pre;
-    private String res;
 
-    public RespuestaSegu(Pregunta pre, String res) {
-        this.pre = pre;
-        this.res = res;
+    private Pregunta pregunta;
+    private String respuesta;
+
+    public RespuestaSegu(Pregunta pregunta, String respuesta) {
+        this.pregunta = pregunta;
+        this.respuesta = respuesta;
     }
 
-    public Pregunta getPre() {
-        return pre;
+    public Pregunta getPregunta() {
+        return pregunta;
     }
 
-    public void setPre(Pregunta pre) {
-        this.pre = pre;
+    public void setPregunta(Pregunta pregunta) {
+        this.pregunta = pregunta;
     }
 
-    public String getRes() {
-        return res;
+    public String getRespuesta() {
+        return respuesta;
     }
 
-    public void setRes(String res) {
-        this.res = res;
-    }
-
-    public boolean ResCorrecta(String respuestaValida){
-        if (this.res == null || respuestaValida == null){
-            return false;
-        }
-        return this.res.trim().equalsIgnoreCase(respuestaValida.trim());
+    public void setRespuesta(String respuesta) {
+        this.respuesta = respuesta;
     }
 
     @Override
     public String toString() {
         return "RespuestaSegu{" +
-                "pre='" + pre + '\'' +
-                ", res='" + res + '\'' +
+                "pregunta=" + pregunta +
+                ", respuesta='" + respuesta + '\'' +
                 '}';
     }
 }

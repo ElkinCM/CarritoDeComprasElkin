@@ -3,7 +3,7 @@ package ec.edu.ups.vista.Producto;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
-import java.net.URL;
+import java.util.Locale;
 
 public class ProductoModificarView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -12,42 +12,43 @@ public class ProductoModificarView extends JInternalFrame {
     private JLabel lblCodigo;
     private JLabel lblNombre;
     private JLabel lblPrecio;
-    private JButton btnModificar;
+    private JButton btnGuardar;
     private JTextField txtNombre;
     private JTextField txtPrecio;
     private JLabel lblTitulo;
 
-    private MensajeInternacionalizacionHandler mensaje;
+    private MensajeInternacionalizacionHandler Internacionalizar;
+    private Locale locale;
 
-    public ProductoModificarView(MensajeInternacionalizacionHandler mensaje) {
-        super("", true, true, false, true);
-        this.mensaje = mensaje;
-
+    public ProductoModificarView(MensajeInternacionalizacionHandler internacionalizar) {
+        super(internacionalizar.get("producto.modificar.menu"), true, true, true, true);
+        this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(500, 500);
 
-        // Cargar íconos si están disponibles
-        URL urlBuscar = getClass().getResource("/search.png");
-        URL urlModificar = getClass().getResource("/edit.png");
+        setFrameIcon(new ImageIcon(getClass().getResource("/modificar.png")));
+        btnBuscar.setIcon(new ImageIcon(getClass().getResource("/buscar.png")));
+        btnGuardar.setIcon(new ImageIcon(getClass().getResource("/guardar.png")));
 
-        if (urlBuscar != null) btnBuscar.setIcon(new ImageIcon(urlBuscar));
-        if (urlModificar != null) btnModificar.setIcon(new ImageIcon(urlModificar));
-
-        actualizarTextos();
+        actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
 
-    public void actualizarTextos() {
-        setTitle(mensaje.get("prod.modificar.titulo.app"));
-        lblTitulo.setText(mensaje.get("prod.modificar.titulo.app"));
-        lblCodigo.setText(mensaje.get("global.codigo"));
-        lblNombre.setText(mensaje.get("global.nombre"));
-        lblPrecio.setText(mensaje.get("global.precio"));
-        txtCodigo.setToolTipText(mensaje.get("prod.top.codigo"));
-        btnBuscar.setText(mensaje.get("btn.buscar"));
-        btnModificar.setText(mensaje.get("btn.modificar"));
+    public void actualizarIdioma(String language, String country) {
+        Internacionalizar.setLenguaje(language, country);
+        lblTitulo.setText(Internacionalizar.get("producto.modificar.titulo"));
+        lblCodigo.setText(Internacionalizar.get("etiqueta.codigo"));
+        lblNombre.setText(Internacionalizar.get("etiqueta.nombre"));
+        lblPrecio.setText(Internacionalizar.get("etiqueta.precio"));
+        btnBuscar.setText(Internacionalizar.get("boton.buscar"));
+        btnGuardar.setText(Internacionalizar.get("boton.guardar"));
     }
 
+    public void vaciarCampo() {
+        txtCodigo.setText("");
+        txtNombre.setText("");
+        txtPrecio.setText("");
+    }
     public JTextField getTxtCodigo() {
         return txtCodigo;
     }
@@ -57,7 +58,7 @@ public class ProductoModificarView extends JInternalFrame {
     }
 
     public JButton getBtnModificar() {
-        return btnModificar;
+        return btnGuardar;
     }
 
     public JTextField getTxtNombre() {
@@ -68,7 +69,7 @@ public class ProductoModificarView extends JInternalFrame {
         return txtPrecio;
     }
 
-    public void mostrarMensaje(String mensajeTexto) {
-        JOptionPane.showMessageDialog(this, mensajeTexto, mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
     }
 }

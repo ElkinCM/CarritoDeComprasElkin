@@ -1,105 +1,119 @@
 package ec.edu.ups.vista.Usuario;
 
-import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
-import java.awt.*;
-import java.net.URL;
+import javax.swing.table.DefaultTableModel;
+import java.util.Locale;
 
 public class UsuarioCrearView extends JInternalFrame {
-    private JLabel lblUsuarioA;
+
+    private JLabel lblUsuario;
     private JLabel lblContraseña;
-    private JLabel lblRol;
     private JTextField txtUsuario;
-    private JTextField txtContraseña;
     private JButton btnCrear;
-    private JComboBox<Rol> cbxRoles;
     private JPanel panelPrincipal;
+    private JTextField txtNombre;
+    private JTextField txtCorreo;
+    private JTextField txtTelefono;
+    private JLabel lblCorreo;
+    private JLabel lblTelefono;
+    private JButton btnSalir;
+    private JLabel lblNacimiento;
+    private JComboBox cbxDia;
+    private JComboBox cbxMes;
+    private JLabel lblDia;
+    private JLabel lblMes;
+    private JLabel lblAnio;
     private JLabel lblTitulo;
+    private JLabel lblNombre;
+    private JTextField txtAnio;
+    private JPasswordField txtContrasenia;
 
-    private MensajeInternacionalizacionHandler mensaje;
+    private final MensajeInternacionalizacionHandler Internacionalizar;
+    private Locale locale;
+    private DefaultTableModel modelo;
 
-    public UsuarioCrearView(MensajeInternacionalizacionHandler mensaje) {
-        super("", true, true, false, true);
-        this.mensaje = mensaje;
-
-        URL urlCrear = getClass().getResource("/plus.png");
-        if (urlCrear != null) {
-            btnCrear.setIcon(new ImageIcon(urlCrear));
-        }
-
+    public UsuarioCrearView(MensajeInternacionalizacionHandler internacionalizar) {
+        super(internacionalizar.get("usuario.crear.menu"), true, true, true, true);
+        this.Internacionalizar = internacionalizar;
         setContentPane(panelPrincipal);
-        setSize(600, 400);
-        setClosable(true);
-        setIconifiable(true);
+        setSize(800, 500);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setFrameIcon(new ImageIcon(getClass().getResource("/usuario_crear.png")));
+        btnCrear.setIcon(new ImageIcon(getClass().getResource("/crear.png")));
+        btnSalir.setIcon(new ImageIcon(getClass().getResource("/salir.png")));
 
-        actualizarTextos();
-        cargarRoles();
+        actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
 
-    public void actualizarTextos() {
-        setTitle(mensaje.get("usr.crear.titulo.app"));
-        lblTitulo.setText(mensaje.get("usr.crear.titulo.app"));
-        lblUsuarioA.setText(mensaje.get("global.usuario") + ": ");
-        lblContraseña.setText(mensaje.get("global.pass") + ":");
-        lblRol.setText(mensaje.get("global.rol") + ":");
+    public void actualizarIdioma(String language, String country) {
+        Internacionalizar.setLenguaje(language, country);
 
-        txtUsuario.setToolTipText(mensaje.get("usr.crear.nombre"));
-        txtContraseña.setToolTipText(mensaje.get("usr.crear.pass"));
-        cbxRoles.setToolTipText(mensaje.get("usr.crear.rol"));
+        lblTitulo.setText(Internacionalizar.get("usuario.crear.titulo"));
+        lblUsuario.setText(Internacionalizar.get("etiqueta.usuario"));
+        lblContraseña.setText(Internacionalizar.get("etiqueta.contrasenia"));
+        lblNombre.setText(Internacionalizar.get("etiqueta.nombre"));
+        lblCorreo.setText(Internacionalizar.get("etiqueta.correo"));
+        lblTelefono.setText(Internacionalizar.get("etiqueta.telefono"));
+        lblNacimiento.setText(Internacionalizar.get("etiqueta.fecha.nacimiento"));
+        lblDia.setText(Internacionalizar.get("etiqueta.dia"));
+        lblMes.setText(Internacionalizar.get("etiqueta.mes"));
+        lblAnio.setText(Internacionalizar.get("etiqueta.anio"));
 
-        btnCrear.setText(mensaje.get("global.crear"));
+        btnCrear.setText(Internacionalizar.get("boton.crear"));
+        btnSalir.setText(Internacionalizar.get("boton.salir"));
 
-        cbxRoles.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Rol) {
-                    Rol rol = (Rol) value;
-                    if (rol == Rol.ADMINISTRADOR) {
-                        setText(mensaje.get("global.rol.admin"));
-                    } else if (rol == Rol.USUARIO) {
-                        setText(mensaje.get("global.rol.user"));
-                    }
-                }
-                return this;
-            }
-        });
+        cargarDias(cbxDia);
+        cargarMes(cbxMes);
     }
 
-    private void cargarRoles() {
-        cbxRoles.removeAllItems();
-        for (Rol rol : Rol.values()) {
-            cbxRoles.addItem(rol);
+    private void cargarDias(JComboBox cbxDia) {
+        cbxDia.removeAllItems();
+        for (int i = 1; i <= 31; i++) {
+            cbxDia.addItem(i);
         }
     }
 
-    public JTextField getTxtUsuario() {
-        return txtUsuario;
+    private void cargarMes(JComboBox cbxMes) {
+        cbxMes.removeAllItems();
+
+        String[] clavesMeses = {
+                "mes.enero", "mes.febrero", "mes.marzo", "mes.abril", "mes.mayo", "mes.junio",
+                "mes.julio", "mes.agosto", "mes.septiembre", "mes.octubre", "mes.noviembre", "mes.diciembre"
+        };
+
+        for (String clave : clavesMeses) {
+            cbxMes.addItem(Internacionalizar.get(clave));
+        }
     }
 
-    public JTextField getTxtContraseña() {
-        return txtContraseña;
-    }
-
-    public JButton getBtnCrear() {
-        return btnCrear;
-    }
-
-    public JComboBox<Rol> getCbxRoles() {
-        return cbxRoles;
-    }
-
-    public void limpiarCampos() {
+    public void vaciarCampo() {
         txtUsuario.setText("");
-        txtContraseña.setText("");
-        if (cbxRoles.getItemCount() > 0) {
-            cbxRoles.setSelectedIndex(0);
-        }
+        txtContrasenia.setText("");
+        txtNombre.setText("");
+        txtCorreo.setText("");
+        txtTelefono.setText("");
+        txtAnio.setText("");
+        if (cbxDia.getItemCount() > 0) cbxDia.setSelectedIndex(0);
+        if (cbxMes.getItemCount() > 0) cbxMes.setSelectedIndex(0);
     }
 
-    public void mostrarMensaje(String mensajeTexto) {
-        JOptionPane.showMessageDialog(this, mensajeTexto, mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
     }
+
+    // Getters
+    public JTextField getTxtUsuario() { return txtUsuario; }
+    public JTextField getTxtContraseña() { return txtContrasenia; }
+    public JTextField getTxtNombre() { return txtNombre; }
+    public JTextField getTxtCorreo() { return txtCorreo; }
+    public JTextField getTxtTelefono() { return txtTelefono; }
+    public JTextField getTxtAnio() { return txtAnio; }
+
+    public JButton getBtnCrear() { return btnCrear; }
+    public JButton getBtnSalir() { return btnSalir; }
+
+    public JComboBox getCbxDia() { return cbxDia; }
+    public JComboBox getCbxMes() { return cbxMes; }
 }

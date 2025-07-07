@@ -6,41 +6,44 @@ import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductoEliminarView extends JInternalFrame {
     private JPanel panelPrincipal;
     private JTextField txtNombre;
     private JTextField txtPrecio;
     private JButton btnEliminar;
-    private JButton BtnBuscar;
+    private JButton btnBuscar;
     private JLabel lblTitulo;
     private JLabel lblNombre;
     private JLabel lblCodigo;
     private JLabel lblPrecio;
     private JTextField txtCodigo;
 
-    private final MensajeInternacionalizacionHandler mensaje;
+    private final MensajeInternacionalizacionHandler Internacionalizar;
+    private Locale locale;
 
-    public ProductoEliminarView(MensajeInternacionalizacionHandler mensaje) {
-        super(mensaje.get("prod.eliminar.titulo.app"),true,true,false,true);
-    this.mensaje = mensaje;
+    public ProductoEliminarView(MensajeInternacionalizacionHandler internacionalizar) {
+        super(internacionalizar.get("producto.eliminar.menu"),true,true,false,true);
+        Internacionalizar = internacionalizar;
+        setContentPane(panelPrincipal);
+        setSize(500,500);
 
-    setContentPane(panelPrincipal);
-    setSize(500,500);
+        setFrameIcon(new ImageIcon(getClass().getResource("/eliminar.png")));
+        btnEliminar.setIcon(new ImageIcon(getClass().getResource("/eliminar.png")));
+        btnBuscar.setIcon(new ImageIcon(getClass().getResource("/buscar.png")));
 
-    actualizartexto();
+        actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
 
-    private void actualizartexto() {
-        setTitle(mensaje.get("prod.eliminar.titulo.app"));
-
-        lblTitulo.setText(mensaje.get("prod.eliminar.titulo"));
-        lblCodigo.setText(mensaje.get("global.codigo"));
-        lblNombre.setText(mensaje.get("global.nombre"));
-        lblPrecio.setText(mensaje.get("global.precio"));
-        txtCodigo.setToolTipText(mensaje.get("prod.top.codigo"));
-        BtnBuscar.setText(mensaje.get("btn.buscar"));
-        btnEliminar.setText(mensaje.get("btn.eliminar"));
+    public void actualizarIdioma(String language, String country) {
+        Internacionalizar.setLenguaje(language, country);
+        lblTitulo.setText(Internacionalizar.get("producto.eliminar.titulo"));
+        lblCodigo.setText(Internacionalizar.get("etiqueta.codigo"));
+        lblNombre.setText(Internacionalizar.get("etiqueta.nombre"));
+        lblPrecio.setText(Internacionalizar.get("etiqueta.precio"));
+        btnBuscar.setText(Internacionalizar.get("boton.buscar"));
+        btnEliminar.setText(Internacionalizar.get("boton.eliminar"));
     }
 
     public JPanel getPanelPrincipal() {
@@ -68,11 +71,11 @@ public class ProductoEliminarView extends JInternalFrame {
     }
 
     public JButton getBtnBuscar() {
-        return BtnBuscar;
+        return btnBuscar;
     }
 
     public void setBtnBuscar(JButton btnBuscar) {
-        this.BtnBuscar = btnBuscar;
+        this.btnBuscar = btnBuscar;
     }
 
     public JLabel getLblCodigo() {
@@ -123,15 +126,15 @@ public class ProductoEliminarView extends JInternalFrame {
         this.lblTitulo = lblTitulo;
     }
 
-    public void limpiarCampos(){
+    public void vaciarCampo(){
         txtCodigo.setText("");
         txtNombre.setText("");
         txtPrecio.setText("");
         txtCodigo.setEnabled(true);
     }
 
-    public void mostrarMensaje(String textoMensaje) {
-        JOptionPane.showMessageDialog(this, textoMensaje, mensaje.get("confirm.app.titulo"), JOptionPane.INFORMATION_MESSAGE);
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
     }
 
 }

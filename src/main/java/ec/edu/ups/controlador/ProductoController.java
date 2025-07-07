@@ -2,8 +2,8 @@ package ec.edu.ups.controlador;
 
 import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.modelo.Producto;
+import ec.edu.ups.util.FormateadorUtils;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.Carrito.CarritoAnadirView;
 import ec.edu.ups.vista.Producto.ProductoAnadirView;
 import ec.edu.ups.vista.Producto.ProductoEliminarView;
 import ec.edu.ups.vista.Producto.ProductoListaView;
@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductoController {
 
@@ -20,163 +21,241 @@ public class ProductoController {
     private ProductoListaView productoListaView;
     private ProductoEliminarView productoEliminarView;
     private ProductoModificarView productoModificarView;
-    private CarritoAnadirView carritoAnadirView;
+
     private final ProductoDAO productoDAO;
-    private final MensajeInternacionalizacionHandler mensaje;
+    private final MensajeInternacionalizacionHandler Internacionalizar;
+    private Locale locale;
 
-    public ProductoController(ProductoDAO productoDAO, CarritoAnadirView carritoAnadirView, ProductoModificarView productoModificarView,
-                              ProductoEliminarView productoEliminarView, ProductoListaView productoListaView,
-                              ProductoAnadirView productoAnadirView, MensajeInternacionalizacionHandler mensaje) {
-        this.productoDAO = productoDAO;
-        this.carritoAnadirView = carritoAnadirView;
-        this.productoModificarView = productoModificarView;
-        this.productoEliminarView = productoEliminarView;
-        this.productoListaView = productoListaView;
+    public ProductoController(ProductoAnadirView productoAnadirView, ProductoListaView productoListaView,
+                              ProductoEliminarView productoEliminarView, ProductoModificarView productoModificarView,
+                              ProductoDAO productoDAO, MensajeInternacionalizacionHandler internacionalizar) {
         this.productoAnadirView = productoAnadirView;
-        this.mensaje = mensaje;
+        this.productoListaView = productoListaView;
+        this.productoEliminarView = productoEliminarView;
+        this.productoModificarView = productoModificarView; // <--- Aquí la asignas
+        this.productoDAO = productoDAO;
+        this.Internacionalizar = internacionalizar;
+
+        configurarAnadirPro();
+        configurarModificarPro();  // Ahora productoModificarView no es null
+        configurarEliminarPro();
+        configurarListarPro();
+        actualizarIdioma();
     }
-    private void configurarEventos() {
+
+    private void configurarAnadirPro() {
         productoAnadirView.getBtnAceptar().addActionListener(e -> guardarProducto());
-        productoAnadirView.getBtnLimpiar().addActionListener(e -> productoAnadirView.limpiarCampos());
-
-        productoListaView.getBtnBuscar().addActionListener(e -> buscarProductoPorNombre());
-        productoListaView.getBtnListar().addActionListener(e -> listarTodosLosProductos());
-
-        productoEliminarView.getBtnBuscar().addActionListener(e -> buscarProductoParaEliminar());
-        productoEliminarView.getBtnEliminar().addActionListener(e -> eliminarProducto());
-
-        productoModificarView.getBtnBuscar().addActionListener(e -> buscarProductoParaModificar());
-        productoModificarView.getBtnModificar().addActionListener(e -> modificarProducto());
-
-        carritoAnadirView.getBtnBuscar().addActionListener(e -> buscarProductoParaCarrito());
     }
 
-    private void guardarProducto() {
-        try {
-            int codigo = Integer.parseInt(productoAnadirView.getTxtCodigo().getText());
-            String nombre = productoAnadirView.getTxtNombre().getText();
-            double precio = Double.parseDouble(productoAnadirView.getTxtPrecio().getText());
+    private void configurarModificarPro() {
+        productoModificarView.getBtnBuscar().addActionListener(e -> {
+            String codigoTexto = productoModificarView.getTxtCodigo().getText().trim();
 
-            if (nombre.isEmpty()) {
-                productoAnadirView.mostrarMensaje(mensaje.get("msg.usr.error.camposVacios"));
+            if (codigoTexto.isEmpty()) {
+                productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.codigo.vacio"));
                 return;
             }
 
-            productoDAO.crear(new Producto(codigo, nombre, precio));
-            productoAnadirView.mostrarMensaje(mensaje.get("msg.prod.guardado"));
-            productoAnadirView.limpiarCampos();
-        } catch (NumberFormatException ex) {
-            productoAnadirView.mostrarMensaje(mensaje.get("msg.car.codInvalido"));
-        }
-    }
-
-    private void buscarProductoPorNombre() {
-        String nombre = productoListaView.getTxtBuscar().getText();
-        List<Producto> productos = productoDAO.buscarPorNombre(nombre);
-        productoListaView.mostrarProductos(productos);
-    }
-
-    private void listarTodosLosProductos() {
-        productoListaView.mostrarProductos(productoDAO.listarTodos());
-    }
-
-    private void buscarProductoParaEliminar() {
-        try {
-            int codigo = Integer.parseInt(productoEliminarView.getTxtCodigo().getText());
-            Producto producto = productoDAO.buscarPorCodigo(codigo);
-
-            if (producto == null) {
-                productoEliminarView.mostrarMensaje(mensaje.get("msg.noEncontrado"));
-            } else {
-                productoEliminarView.getTxtNombre().setText(producto.getNombre());
-                productoEliminarView.getTxtPrecio().setText(String.valueOf(producto.getPrecio()));
-                productoEliminarView.getTxtCodigo().setEnabled(false);
-                productoEliminarView.getBtnEliminar().setEnabled(true);
-            }
-        } catch (NumberFormatException ex) {
-            productoEliminarView.mostrarMensaje(mensaje.get("msg.car.codInvalido"));
-        }
-    }
-
-    private void eliminarProducto() {
-        String mensajeConfirmacion = mensaje.get("confirm.prod.elim");
-        int respuesta = JOptionPane.showConfirmDialog(productoEliminarView, mensajeConfirmacion, mensaje.get("confirm.app.titulo"), JOptionPane.YES_NO_OPTION);
-
-        if (respuesta == JOptionPane.YES_OPTION) {
-            int codigo = Integer.parseInt(productoEliminarView.getTxtCodigo().getText());
-            productoDAO.eliminar(codigo);
-            productoEliminarView.mostrarMensaje(mensaje.get("msg.prod.eliminado"));
-            productoEliminarView.limpiarCampos();
-        }
-    }
-
-    private void buscarProductoParaModificar() {
-        try {
-            int codigo = Integer.parseInt(productoModificarView.getTxtCodigo().getText());
-            Producto producto = productoDAO.buscarPorCodigo(codigo);
-
-            if (producto == null) {
-                productoModificarView.mostrarMensaje(mensaje.get("msg.noEncontrado"));
-            } else {
-                productoModificarView.getTxtNombre().setText(producto.getNombre());
-                productoModificarView.getTxtPrecio().setText(String.valueOf(producto.getPrecio()));
-                productoModificarView.getBtnModificar().setEnabled(true);
-                productoModificarView.getBtnBuscar().setEnabled(false);
-                productoModificarView.getTxtCodigo().setEditable(false);
-            }
-        } catch (NumberFormatException ex) {
-            productoModificarView.mostrarMensaje(mensaje.get("msg.car.codInvalido"));
-        }
-    }
-
-    private void modificarProducto() {
-        String mensajeConfirmacion = mensaje.get("confirm.prod.mod");
-        int respuesta = JOptionPane.showConfirmDialog(productoModificarView, mensajeConfirmacion, mensaje.get("confirm.app.titulo"), JOptionPane.YES_NO_OPTION);
-
-        if (respuesta == JOptionPane.YES_OPTION) {
             try {
-                int codigo = Integer.parseInt(productoModificarView.getTxtCodigo().getText());
-                String nombre = productoModificarView.getTxtNombre().getText();
-                double precio = Double.parseDouble(productoModificarView.getTxtPrecio().getText());
+                int codigo = Integer.parseInt(codigoTexto);
+                Producto producto = productoDAO.buscarPorCodigo(codigo);
 
-                if (nombre.trim().isEmpty()) {
-                    productoModificarView.mostrarMensaje(mensaje.get("msg.usr.error.camposVacios"));
+                if (producto != null) {
+                    productoModificarView.getTxtNombre().setText(producto.getNombre());
+                    productoModificarView.getTxtPrecio().setText(String.valueOf(producto.getPrecio()));
+                    productoModificarView.getTxtNombre().setEnabled(true);
+                    productoModificarView.getTxtPrecio().setEnabled(true);
+                } else {
+                    productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.noencontrado"));
+                }
+
+            } catch (NumberFormatException ex) {
+                productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.codigo.invalido"));
+            }
+        });
+        productoModificarView.getBtnModificar().addActionListener(e -> {
+            String codigoTexto = productoModificarView.getTxtCodigo().getText().trim();
+
+            if (codigoTexto.isEmpty()) {
+                productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.codigo.vacio"));
+                return;
+            }
+
+            try {
+                int codigo = Integer.parseInt(codigoTexto);
+                actualizar(codigo);
+                productoModificarView.vaciarCampo();
+                productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.modificado"));
+            } catch (NumberFormatException ex) {
+                productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.codigo.invalido"));
+            }
+        });
+    }
+
+    private void configurarEliminarPro() {
+        productoEliminarView.getBtnBuscar().addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String codigoTexto = productoEliminarView.getTxtCodigo().getText().trim();
+
+            if (codigoTexto.isEmpty()) {
+                productoEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.codigo.vacio"));
+                return;
+            }
+
+            try {
+                int codigo = Integer.parseInt(codigoTexto);
+                Producto productoEncontrado = productoDAO.buscarPorCodigo(codigo);
+
+                if (productoEncontrado != null) {
+                    productoEliminarView.getTxtNombre().setText(productoEncontrado.getNombre());
+                    productoEliminarView.getTxtPrecio().setText(
+                            FormateadorUtils.formatearMoneda(productoEncontrado.getPrecio(), Internacionalizar.getLocale())
+                    );
+                    productoEliminarView.getTxtNombre().setEnabled(false);
+                    productoEliminarView.getTxtPrecio().setEnabled(false);
+                } else {
+                    productoEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.noencontrado"));
+                }
+            } catch (NumberFormatException ex) {
+                productoEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.codigo.invalido"));
+            }
+        }
+    });
+        productoEliminarView.getBtnEliminar().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String codigoTexto = productoEliminarView.getTxtCodigo().getText().trim();
+
+                if (codigoTexto.isEmpty()) {
+                    productoEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.codigo.vacio"));
                     return;
                 }
 
-                Producto productoActualizado = new Producto(codigo, nombre, precio);
-                productoDAO.actualizar(productoActualizado);
+                int respuesta = JOptionPane.showConfirmDialog(
+                        productoEliminarView,
+                        Internacionalizar.get("mensaje.producto.confirmacion"),
+                        Internacionalizar.get("mensaje.confirmacion.titulo"),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
 
-                productoModificarView.mostrarMensaje(mensaje.get("msg.prod.modificado"));
-                productoModificarView.getTxtCodigo().setText("");
-                productoModificarView.getTxtNombre().setText("");
-                productoModificarView.getTxtPrecio().setText("");
-                productoModificarView.getBtnModificar().setEnabled(false);
-                productoModificarView.getBtnBuscar().setEnabled(true);
-                productoModificarView.getTxtCodigo().setEditable(true);
-
-            } catch (NumberFormatException ex) {
-                productoModificarView.mostrarMensaje(mensaje.get("msg.car.codInvalido"));
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    try {
+                        int codigo = Integer.parseInt(codigoTexto);
+                        eliminar(codigo);
+                        productoEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.eliminado"));
+                        productoEliminarView.vaciarCampo();
+                    } catch (NumberFormatException ex) {
+                        productoEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.codigo.invalido"));
+                    }
+                } else {
+                    productoEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.cancelar"));
+                }
             }
+        });
+    }
+
+    private void configurarListarPro(){
+        productoListaView.getBtnBuscar().addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String nombreBusqueda = productoListaView.getTxtBuscar().getText().trim();
+
+            if (nombreBusqueda.isEmpty()) {
+                productoListaView.mostrarMensaje(Internacionalizar.get("mensaje.nombre.vacio"));
+                return;
+            }
+
+            List<Producto> resultados = productoDAO.buscarPorNombre(nombreBusqueda);
+
+            if (resultados.isEmpty()) {
+                productoListaView.mostrarMensaje(Internacionalizar.get("mensaje.producto.noencontrado"));
+            } else {
+                productoListaView.cargarDatosListaProducto(resultados);
+            }
+        }
+    });
+        productoListaView.getBtnListar().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<Producto> productos = productoDAO.listarTodos();
+                if (productos == null || productos.isEmpty()) {
+                    productoListaView.mostrarMensaje(Internacionalizar.get("mensaje.producto.noencontrado"));
+                } else {
+                    productoListaView.cargarDatosListaProducto(productos);
+                }
+                productoListaView.getTxtBuscar().setText(""); // Limpiar campo de búsqueda
+            }
+        });
+    }
+    private void guardarProducto() {
+        try {
+            String codigoTexto = productoAnadirView.getTxtCodigo().getText().trim();
+            String nombre = productoAnadirView.getTxtNombre().getText().trim();
+            String precioTexto = productoAnadirView.getTxtPrecio().getText().trim();
+
+            if (codigoTexto.isEmpty() || nombre.isEmpty() || precioTexto.isEmpty()) {
+                productoAnadirView.mostrarMensaje(Internacionalizar.get("mensaje.campos.vacios"));
+                return;
+            }
+
+            int codigo = Integer.parseInt(codigoTexto);
+            double precio = Double.parseDouble(precioTexto);
+
+            Producto nuevoProducto = new Producto(codigo, nombre, precio);
+            productoDAO.crear(nuevoProducto);
+
+            productoAnadirView.mostrarMensaje(Internacionalizar.get("mensaje.producto.creado"));
+            productoAnadirView.vaciarCampo();
+
+        } catch (NumberFormatException e) {
+            productoAnadirView.mostrarMensaje(Internacionalizar.get("mensaje.datos.invalidos"));
         }
     }
 
-    private void buscarProductoParaCarrito() {
-        try {
-            int codigo = Integer.parseInt(carritoAnadirView.getTxtCodigo().getText());
-            Producto producto = productoDAO.buscarPorCodigo(codigo);
+    private void actualizar(int codigo) {
+        Producto producto = productoDAO.buscarPorCodigo(codigo);
 
-            if (producto == null) {
-                carritoAnadirView.mostrarMensaje(mensaje.get("msg.noEncontrado"));
-                carritoAnadirView.getTxtNombre().setText("");
-                carritoAnadirView.getTxtPrecio().setText("");
-            } else {
-                carritoAnadirView.getTxtNombre().setText(producto.getNombre());
-                carritoAnadirView.getTxtPrecio().setText(String.valueOf(producto.getPrecio()));
-            }
-        } catch (NumberFormatException ex) {
-            carritoAnadirView.mostrarMensaje(mensaje.get("msg.car.codInvalido"));
+        if (producto == null) {
+            productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.noencontrado"));
+            return;
         }
+
+        String nombre = productoModificarView.getTxtNombre().getText().trim();
+        String precioTexto = productoModificarView.getTxtPrecio().getText().trim();
+
+        if (nombre.isEmpty() || precioTexto.isEmpty()) {
+            productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.campos.vacios"));
+            return;
+        }
+
+        try {
+            double precio = Double.parseDouble(precioTexto);
+
+            producto.setNombre(nombre);
+            producto.setPrecio(precio);
+            productoDAO.actualizar(producto);
+        } catch (NumberFormatException e) {
+            productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.precio.invalido"));
+        }
+    }
+
+    private void eliminar(int codigo) {
+        productoDAO.eliminar(codigo);
+    }
+
+    private void actualizarIdioma() {
+        productoAnadirView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
+        productoListaView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
+        productoEliminarView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
+    }
+
+    public void cambiarIdioma(String lenguaje, String pais) {
+        Internacionalizar.setLenguaje(lenguaje, pais);
+        this.locale = Internacionalizar.getLocale();
+
+        actualizarIdioma();
     }
 
 }
