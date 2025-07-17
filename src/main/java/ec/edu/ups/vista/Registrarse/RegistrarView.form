@@ -62,28 +62,28 @@
             </properties>
             <border type="none"/>
             <children>
-              <component id="3cc26" class="javax.swing.JLabel" binding="lblMes">
+              <component id="3cc26" class="javax.swing.JLabel" binding="lblDia">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Dia"/>
+                </properties>
+              </component>
+              <component id="9d203" class="javax.swing.JLabel" binding="lblMes">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <text value="Mes"/>
                 </properties>
               </component>
-              <component id="9d203" class="javax.swing.JLabel" binding="lblAnio">
-                <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Año"/>
-                </properties>
-              </component>
-              <component id="e2a68" class="javax.swing.JLabel" binding="lblDia">
+              <component id="e2a68" class="javax.swing.JLabel" binding="lblAnio">
                 <constraints>
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Dia"/>
+                  <text value="Año"/>
                 </properties>
               </component>
               <component id="4da1e" class="javax.swing.JComboBox" binding="cbxDia">

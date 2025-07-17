@@ -18,7 +18,7 @@ public class PreguntaDAOMemoria implements PreguntaDAO {
     }
 
     private void inicializarPreguntas() {
-        for (int i = 1; i <= 12; i++) {
+        for (int i = 1; i <= 13; i++) {
             crear(i, "pregunta" + i);
         }
     }

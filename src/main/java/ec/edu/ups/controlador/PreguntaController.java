@@ -2,6 +2,7 @@ package ec.edu.ups.controlador;
 
 import ec.edu.ups.dao.PreguntaDAO;
 import ec.edu.ups.dao.UsuarioDAO;
+import ec.edu.ups.modelo.Pregunta;
 import ec.edu.ups.modelo.RespuestaSegu;
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
@@ -82,7 +83,7 @@ public class PreguntaController {
         quitarActionListeners(registraseView.getBtnGuardar());
         quitarActionListeners(registraseView.getBtnRegistar());
 
-        registraseView.getBtnGuardar().addActionListener(new ActionListener() {
+        registraseView.getBtnRegistar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 if(preguntasRespondidas.size() < 3){
@@ -161,7 +162,7 @@ public class PreguntaController {
         registraseView.getBtnGuardar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                if(cont > 12){
+                if(cont > 13){
                     return;
                 }
                 if(!registraseView.getTxtPregunta().getText().isEmpty()){
@@ -177,9 +178,14 @@ public class PreguntaController {
         });
     }
 
-    private void cargarPregunta(int codigo){
+    private void cargarPregunta(int codigo) {
+        Pregunta pregunta = preguntaDAO.buscarPorCodigo(codigo);
+        if (pregunta == null) {
+            registraseView.getLblEnunciado().setText(Internacionalizar.get("mensaje.pregunta.noencontrada"));
+            return;
+        }
         registraseView.getLblPreguntas().setText(Internacionalizar.get("registro.numero.pregunta") + " " + codigo);
-        registraseView.getLblEnunciado().setText(Internacionalizar.get(preguntaDAO.buscarPorCodigo(codigo).getTexto()));
+        registraseView.getLblEnunciado().setText(Internacionalizar.get(pregunta.getTexto()));
     }
 
     private void configurarEventosEnOlvidada() {
@@ -260,9 +266,15 @@ public class PreguntaController {
     }
 
     private void cargarPreguntaOlvidada(int codigo){
+        Pregunta pregunta = preguntaDAO.buscarPorCodigo(codigo);
+        if (pregunta == null) {
+            recuperarView.getLblEnunciado().setText(Internacionalizar.get("mensaje.pregunta.noencontrada"));
+            return;
+        }
         recuperarView.getLblPreguntas().setText(Internacionalizar.get("registro.numero.pregunta") + " " + codigo);
-        recuperarView.getLblEnunciado().setText(Internacionalizar.get(preguntaDAO.buscarPorCodigo(codigo).getTexto()));
+        recuperarView.getLblEnunciado().setText(Internacionalizar.get(pregunta.getTexto()));
     }
+
 
     public void cambiarIdioma(String lenguaje, String pais) {
         Internacionalizar.setLenguaje(lenguaje, pais);
