@@ -5,11 +5,24 @@ import ec.edu.ups.modelo.*;
 
 import java.io.*;
 import java.util.*;
-
+/**
+ * Implementación de {@link UsuarioDAO} que almacena y gestiona usuarios en un archivo de texto.
+ * El archivo incluye información del usuario, sus carritos y preguntas de seguridad.
+ *
+ * Formato del archivo:
+ * <pre>
+ * username,contraseña,rol,nombre,telefono,correo,fechaNacimiento[carritos],[preguntas]
+ * </pre>
+ */
 public class UsuarioDAOArchivoTexto implements UsuarioDAO {
 
     private final String rutaArchivo;
-
+    /**
+     * Constructor que inicializa el DAO y crea el archivo si no existe.
+     * También agrega un usuario administrador de ejemplo.
+     *
+     * @param rutaBase Ruta base del directorio donde se guardará el archivo.
+     */
     public UsuarioDAOArchivoTexto(String rutaBase) {
         File directorio = new File(rutaBase, "CarritoCompras");
         if (!directorio.exists() && !directorio.mkdirs()) {
@@ -30,7 +43,13 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
             }
         }
     }
-
+    /**
+     * Autentica un usuario buscando por su nombre de usuario y contraseña.
+     *
+     * @param username    Nombre de usuario.
+     * @param contrasenia Contraseña.
+     * @return Usuario autenticado o {@code null} si no se encuentra.
+     */
     @Override
     public Usuario autenticar(String username, String contrasenia) {
         for (Usuario u : listarTodos()) {
@@ -41,6 +60,11 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
         return null;
     }
 
+    /**
+     * Guarda un nuevo usuario en el archivo.
+     *
+     * @param usuario Usuario a guardar.
+     */
     @Override
     public void crear(Usuario usuario) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo, true))) {
@@ -50,7 +74,12 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
             System.out.println("Error al crear usuario: " + e.getMessage());
         }
     }
-
+    /**
+     * Busca un usuario por su nombre de usuario.
+     *
+     * @param username Nombre de usuario.
+     * @return Usuario encontrado o {@code null} si no existe.
+     */
     @Override
     public Usuario buscarPorUsuario(String username) {
         for (Usuario u : listarTodos()) {
@@ -60,14 +89,22 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
         }
         return null;
     }
-
+    /**
+     * Elimina un usuario del archivo según su nombre de usuario.
+     *
+     * @param username Nombre de usuario a eliminar.
+     */
     @Override
     public void eliminar(String username) {
         List<Usuario> usuarios = listarTodos();
         usuarios.removeIf(u -> u.getUsername().equals(username));
         guardarTodos(usuarios);
     }
-
+    /**
+     * Actualiza los datos de un usuario.
+     *
+     * @param usuario Usuario con los datos actualizados.
+     */
     @Override
     public void actualizar(Usuario usuario) {
         List<Usuario> usuarios = listarTodos();
@@ -79,17 +116,30 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
         }
         guardarTodos(usuarios);
     }
-
+    /**
+     * Lista todos los usuarios con rol ADMINISTRADOR.
+     *
+     * @return Lista de administradores.
+     */
     @Override
     public List<Usuario> listarAdministradores() {
         return listarRol(Rol.ADMINISTRADOR);
     }
-
+    /**
+     * Lista todos los usuarios con rol USUARIO.
+     *
+     * @return Lista de usuarios.
+     */
     @Override
     public List<Usuario> listarUsuarios() {
         return listarRol(Rol.USUARIO);
     }
-
+    /**
+     * Lista los usuarios por rol especificado.
+     *
+     * @param rol Rol a filtrar.
+     * @return Lista de usuarios con el rol indicado.
+     */
     @Override
     public List<Usuario> listarRol(Rol rol) {
         List<Usuario> resultado = new ArrayList<>();
@@ -100,7 +150,11 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
         }
         return resultado;
     }
-
+    /**
+     * Lista todos los usuarios del archivo.
+     *
+     * @return Lista completa de usuarios.
+     */
     @Override
     public List<Usuario> listarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
@@ -115,6 +169,11 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
         return usuarios;
     }
 
+    /**
+     * Guarda la lista completa de usuarios sobrescribiendo el archivo.
+     *
+     * @param usuarios Lista de usuarios a guardar.
+     */
     private void guardarTodos(List<Usuario> usuarios) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo, false))) {
             for (Usuario u : usuarios) {
@@ -125,7 +184,12 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
             System.out.println("Error al guardar usuarios: " + e.getMessage());
         }
     }
-
+    /**
+     * Convierte un objeto {@link Usuario} en una línea de texto para guardar.
+     *
+     * @param usuario Usuario a convertir.
+     * @return Línea de texto representando al usuario.
+     */
     private String usuarioToLinea(Usuario usuario) {
         String linea = usuario.getUsername() + "," +
                 usuario.getContrasenia() + "," +
@@ -157,7 +221,12 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
         linea += "]";
         return linea;
     }
-
+    /**
+     * Convierte una línea de texto del archivo a un objeto {@link Usuario}.
+     *
+     * @param linea Línea de texto.
+     * @return Usuario construido.
+     */
     private Usuario lineaToUsuario(String linea) {
         String[] partes = separarUsuarioLinea(linea);
         String[] atributos = partes[0].split(",");
@@ -215,7 +284,12 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
 
         return usuario;
     }
-
+    /**
+     * Convierte un objeto {@link Carrito} en texto plano.
+     *
+     * @param carrito Carrito a convertir.
+     * @return Texto representando el carrito.
+     */
     private String carritoToString(Carrito carrito) {
         String linea = carrito.getCodigo() + "_" +
                 carrito.getUsuario().getUsername() + "_" +
@@ -232,7 +306,13 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
         linea += "]";
         return linea;
     }
-
+    /**
+     * Reconstruye un carrito desde una cadena de texto.
+     *
+     * @param s       Texto con formato de carrito.
+     * @param usuario Usuario al que pertenece el carrito.
+     * @return Carrito reconstruido.
+     */
     private Carrito carritoDeString(String s, Usuario usuario) {
         String[] partes = s.split("_", 4);
         if (partes.length < 4) return null;
@@ -274,7 +354,12 @@ public class UsuarioDAOArchivoTexto implements UsuarioDAO {
 
         return carrito;
     }
-
+    /**
+     * Separa una línea del archivo en atributos, carritos y preguntas de seguridad.
+     *
+     * @param linea Línea completa.
+     * @return Array con 3 posiciones: atributos, carritos, preguntas.
+     */
     private String[] separarUsuarioLinea(String linea) {
         int primerCorchete = linea.indexOf('[');
         int segundoCorchete = -1;

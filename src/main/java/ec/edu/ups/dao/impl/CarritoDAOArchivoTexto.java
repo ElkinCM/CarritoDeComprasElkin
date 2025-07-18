@@ -10,13 +10,21 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+/**
+ * Implementación de {@link CarritoDAO} que almacena datos en un archivo de texto plano.
+ * Cada carrito se guarda como una línea en el archivo, serializado en un formato específico.
+ */
 public class CarritoDAOArchivoTexto implements CarritoDAO {
     private String rutaArchivo;
     private FileReader fileReader;
     private BufferedReader bufferedReader;
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
-
+    /**
+     * Constructor que inicializa la ruta y crea los archivos necesarios si no existen.
+     *
+     * @param rutaInicial Ruta base donde se creará el archivo "CarritoCompras/carrito.txt".
+     */
     public CarritoDAOArchivoTexto(String rutaInicial) {
         File archivo = new File(rutaInicial + "\\CarritoCompras");
         if (!archivo.exists()) {
@@ -32,7 +40,11 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
             }
         }
     }
-
+    /**
+     * Guarda un nuevo carrito en el archivo.
+     *
+     * @param carrito El carrito que se va a guardar.
+     */
     @Override
     public void crear(Carrito carrito) {
         try {
@@ -45,7 +57,12 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
             cerrarWriter();
         }
     }
-
+    /**
+     * Busca un carrito por su código.
+     *
+     * @param codigo Código del carrito.
+     * @return El carrito si se encuentra, o null si no existe.
+     */
     @Override
     public Carrito buscarPorCodigo(int codigo) {
         try {
@@ -64,7 +81,11 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
         }
         return null;
     }
-
+    /**
+     * Actualiza los datos de un carrito existente.
+     *
+     * @param carrito El carrito actualizado.
+     */
     @Override
     public void actualizar(Carrito carrito) {
         List<Carrito> carritos = listarTodos();
@@ -83,7 +104,11 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
             cerrarWriter();
         }
     }
-
+    /**
+     * Elimina un carrito según su código.
+     *
+     * @param codigo Código del carrito a eliminar.
+     */
     @Override
     public void eliminar(int codigo) {
         List<Carrito> carritos = listarTodos();
@@ -101,7 +126,11 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
             cerrarWriter();
         }
     }
-
+    /**
+     * Lista todos los carritos almacenados en el archivo.
+     *
+     * @return Lista de todos los carritos.
+     */
     @Override
     public List<Carrito> listarTodos() {
         List<Carrito> carritos = new ArrayList<>();
@@ -121,7 +150,12 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
         }
         return carritos;
     }
-
+    /**
+     * Busca todos los carritos pertenecientes a un usuario específico.
+     *
+     * @param usuario Usuario del cual se desea obtener los carritos.
+     * @return Lista de carritos asociados al usuario.
+     */
     @Override
     public List<Carrito> buscarPorUsuario(Usuario usuario) {
         List<Carrito> carritos = new ArrayList<>();
@@ -142,7 +176,13 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
         }
         return carritos;
     }
-
+    /**
+     * Convierte una línea de texto del archivo a un objeto Carrito.
+     *
+     * @param s       Línea del archivo.
+     * @param usuario Usuario opcional para asociar directamente al carrito.
+     * @return Objeto Carrito representado por la línea.
+     */
     private Carrito CarritoString(String s, Usuario usuario) {
         String[] partes = s.split("_");
         if (partes.length < 4) {
@@ -187,7 +227,11 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
         carrito.setFecha(fechaCreacion);
         return carrito;
     }
-
+    /**
+     * Abre el archivo para escritura.
+     *
+     * @param append true para añadir al final del archivo, false para sobrescribir.
+     */
     private void abrirWriter(boolean append) {
         try {
             fileWriter = new FileWriter(rutaArchivo, append);
@@ -198,7 +242,9 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
             fileWriter = null;
         }
     }
-
+    /**
+     * Cierra los flujos de escritura del archivo.
+     */
     private void cerrarWriter() {
         try {
             if (bufferedWriter != null) {
@@ -211,7 +257,9 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
             System.out.println("Error al cerrar el archivo de escritura: " + e.getMessage());
         }
     }
-
+    /**
+     * Abre el archivo para lectura.
+     */
     private void abrirReader() {
         try {
             fileReader = new FileReader(rutaArchivo);
@@ -222,7 +270,9 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
             fileReader = null;
         }
     }
-
+    /**
+     * Cierra los flujos de lectura del archivo.
+     */
     private void cerrarReader() {
         try {
             if (bufferedReader != null) {

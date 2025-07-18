@@ -12,7 +12,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Locale;
-
+/**
+ * Controlador para gestionar las operaciones del carrito de compras.
+ * Permite añadir, modificar, eliminar, buscar y listar carritos e ítems,
+ * así como actualizar el idioma de la interfaz de usuario.
+ *
+ * Esta clase implementa el patrón MVC actuando como el controlador entre el modelo y las vistas.
+ *
+ * @author Elkin Chamba
+ * @version 1.0
+ */
 public class CarritoController {
 
     private Carrito carrito;
@@ -28,8 +37,18 @@ public class CarritoController {
     private final CarritoListarMisItemsView carritoListarMisItemsView;
 
     private MensajeInternacionalizacionHandler Internacionalizar;
-
-
+    /**
+     * Constructor del controlador de carrito.
+     *
+     * @param carritoDAO DAO para operaciones de carrito.
+     * @param productoDAO DAO para operaciones de producto.
+     * @param carritoAnadirView Vista para añadir productos al carrito.
+     * @param carritoModificarView Vista para modificar carritos.
+     * @param carritoEliminarView Vista para eliminar carritos.
+     * @param carritoListarView Vista para listar carritos.
+     * @param carritoListarMisItemsView Vista para mostrar detalles del carrito.
+     * @param internacionalizar Handler para mensajes internacionalizados.
+     */
     public CarritoController(CarritoDAO carritoDAO, ProductoDAO productoDAO, CarritoAnadirView carritoAnadirView,
                              CarritoModificarView carritoModificarView, CarritoEliminarView carritoEliminarView,
                              CarritoListarView carritoListarView, CarritoListarMisItemsView carritoListarMisItemsView, MensajeInternacionalizacionHandler internacionalizar) {
@@ -50,7 +69,9 @@ public class CarritoController {
         configurarListarCa();
         actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
-
+    /**
+     * Configura los listeners para la vista de añadir carrito.
+     */
     private void configurarAnadirCa() {
         carritoAnadirView.getBtnAñadir().addActionListener(new ActionListener() {
             @Override
@@ -87,7 +108,9 @@ public class CarritoController {
             }
         });
     }
-
+    /**
+     * Configura los listeners para modificar un carrito existente.
+     */
     private void configurarModificarCa() {
         carritoModificarView.getBtnAnadir().addActionListener(new ActionListener() {
             @Override
@@ -316,7 +339,9 @@ public class CarritoController {
             }
         });
     }
-
+    /**
+     * Configura los listeners para eliminar carritos.
+     */
     private void configurarEliminarCa() {
         carritoEliminarView.getBtnBuscar().addActionListener(new ActionListener() {
             @Override
@@ -398,7 +423,9 @@ public class CarritoController {
             }
         });
     }
-
+    /**
+     * Configura los listeners para listar carritos y ver detalles.
+     */
     private void configurarListarCa() {
         carritoListarView.getBtnBuscar().addActionListener(new ActionListener() {
             @Override
@@ -434,6 +461,11 @@ public class CarritoController {
             public void actionPerformed(ActionEvent e) {
                 carritoListarView.vaciarCampo();
 
+                if (usuario == null) {
+                    carritoListarView.mostrarMensaje("Usuario no autenticado. Por favor inicia sesión.");
+                    return;
+                }
+
                 List<Carrito> carritos;
                 if (usuario.getRol().equals(Rol.USUARIO)) {
                     carritos = carritoDAO.buscarPorUsuario(usuario);
@@ -449,6 +481,7 @@ public class CarritoController {
                 carritoListarView.cargarDatosCarritoLista(carritos);
             }
         });
+
         carritoListarView.getBtnDetallar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -480,7 +513,12 @@ public class CarritoController {
             }
         });
     }
-
+    /**
+     * Verifica si un producto ya existe en el carrito.
+     *
+     * @param producto El producto a verificar.
+     * @return true si ya está en el carrito, false si no.
+     */
     private boolean existeProductoEnCarrito(Producto producto) {
         List<ItemCarrito> items = carrito.obtenerItems();
 
@@ -493,7 +531,11 @@ public class CarritoController {
 
         return false;
     }
-
+    /**
+     * Añade un producto al carrito actual.
+     *
+     * @param codigo Código del producto a añadir.
+     */
     private void anadirEnCarrito(int codigo) {
         Producto productoEncontrado = productoDAO.buscarPorCodigo(codigo);
 
@@ -523,7 +565,11 @@ public class CarritoController {
         );
         carritoAnadirView.getBtnGuardar().setEnabled(true);
     }
-
+    /**
+     * Busca un producto y lo muestra en la vista de añadir carrito.
+     *
+     * @param Codigo Código del producto a buscar.
+     */
     private void buscarEnCarrito(int Codigo){
             Producto productoEncontrado = productoDAO.buscarPorCodigo(Codigo);
 
@@ -544,7 +590,12 @@ public class CarritoController {
                 carritoAnadirView.mostrarMensaje(mensaje);
             }
         }
-
+    /**
+     * Actualiza el idioma de todas las vistas del controlador.
+     *
+     * @param language Código de idioma (ej: "es", "en").
+     * @param country Código de país (ej: "EC", "US").
+     */
     public void actualizarIdioma(String language, String country) {
         this.locale = new Locale(language, country);
         carritoAnadirView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
@@ -553,7 +604,12 @@ public class CarritoController {
         carritoListarView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
         carritoListarMisItemsView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
-
+    /**
+     * Cambia el idioma de la aplicación y actualiza la vista.
+     *
+     * @param languge Código de idioma.
+     * @param country Código de país.
+     */
     public void cambiarIdioma(String languge, String country) {
         Internacionalizar.setLenguaje(languge, country);
         this.locale = Internacionalizar.getLocale();

@@ -15,7 +15,14 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
-
+/**
+ * Controlador encargado de manejar la lógica relacionada con preguntas de seguridad
+ * para el registro de usuarios y recuperación de contraseñas.
+ *
+ * Gestiona eventos en las vistas LoginView, RegistrarView y RecuperarView.
+ * También se encarga de la internacionalización de mensajes.
+ *
+ */
 public class PreguntaController {
     private final UsuarioDAO usuarioDAO;
     private final LoginView loginView;
@@ -24,7 +31,16 @@ public class PreguntaController {
     private final RecuperarView recuperarView;
     private int cont;
     private MensajeInternacionalizacionHandler Internacionalizar;
-
+    /**
+     * Constructor principal que inicializa el controlador y configura los eventos de las vistas.
+     *
+     * @param usuarioDAO DAO para manejar usuarios.
+     * @param loginView Vista de login.
+     * @param registraseView Vista de registro de usuario.
+     * @param preguntaDAO DAO para manejar preguntas de seguridad.
+     * @param recuperarView Vista para recuperación de contraseña.
+     * @param Internacionalizar Manejador de internacionalización de mensajes.
+     */
     public PreguntaController(UsuarioDAO usuarioDAO, LoginView loginView, RegistrarView registraseView,
                               PreguntaDAO preguntaDAO, RecuperarView recuperarView, MensajeInternacionalizacionHandler Internacionalizar) {
         this.usuarioDAO = usuarioDAO;
@@ -36,8 +52,9 @@ public class PreguntaController {
         this.cont = 1;
         configurarEventosEnVista();
     }
-
-
+    /**
+     * Configura los eventos iniciales en la vista de login.
+     */
     private void configurarEventosEnVista(){
 
         loginView.getBtnRegistrarse().addActionListener(new ActionListener() {
@@ -64,15 +81,17 @@ public class PreguntaController {
             }
         });
     }
-
-
+    /**
+     * Navega a la vista de registro y configura sus eventos.
+     */
     private void registrarse() {
         loginView.setVisible(false);
         configurarEventosEnRegistrarse();
         registraseView.setVisible(true);
     }
-
-
+    /**
+     * Configura los eventos en la vista de registro.
+     */
     private void configurarEventosEnRegistrarse() {
         registraseView.getTxtUsuario().setText("");
         registraseView.getTxtContrasenia().setText("");
@@ -177,7 +196,11 @@ public class PreguntaController {
             }
         });
     }
-
+    /**
+     * Carga una pregunta de seguridad por su código.
+     *
+     * @param codigo Código de la pregunta a cargar.
+     */
     private void cargarPregunta(int codigo) {
         Pregunta pregunta = preguntaDAO.buscarPorCodigo(codigo);
         if (pregunta == null) {
@@ -187,7 +210,9 @@ public class PreguntaController {
         registraseView.getLblPreguntas().setText(Internacionalizar.get("registro.numero.pregunta") + " " + codigo);
         registraseView.getLblEnunciado().setText(Internacionalizar.get(pregunta.getTexto()));
     }
-
+    /**
+     * Configura los eventos para la recuperación de contraseña.
+     */
     private void configurarEventosEnOlvidada() {
         Usuario usuarioRecuperacion = usuarioDAO.buscarPorUsuario(loginView.getTxtUsername().getText());
         List<RespuestaSegu> preguntas = usuarioRecuperacion.getRespuestaSegu();
@@ -274,15 +299,18 @@ public class PreguntaController {
         recuperarView.getLblPreguntas().setText(Internacionalizar.get("registro.numero.pregunta") + " " + codigo);
         recuperarView.getLblEnunciado().setText(Internacionalizar.get(pregunta.getTexto()));
     }
-
-
+    /**
+     * Configura los eventos para cambiar Idioma
+     */
     public void cambiarIdioma(String lenguaje, String pais) {
         Internacionalizar.setLenguaje(lenguaje, pais);
         registraseView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
         recuperarView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
         cargarPregunta(cont);
     }
-
+    /**
+     * Configura metodo de randomizar Pregunta
+     */
     private void randomizarListaPreguntaRespondida(List<RespuestaSegu> lista) {
         List<RespuestaSegu> listaRandomizada = new LinkedList<>();
         while (!lista.isEmpty()) {
