@@ -4,12 +4,19 @@ public class Producto {
     private int codigo;
     private String nombre;
     private double precio;
+    private static int contador = 1;
 
     public Producto() {
     }
 
     public Producto(int codigo, String nombre, double precio) {
         this.codigo = codigo;
+        this.nombre = nombre;
+        this.precio = precio;
+    }
+
+    public Producto(String nombre, double precio) {
+        this.codigo = contador++;
         this.nombre = nombre;
         this.precio = precio;
     }
@@ -37,6 +44,10 @@ public class Producto {
     public double getPrecio() {
         return precio;
     }
+
+    public int getContador() { return contador;}
+
+    public void setContador(int contador) { this.contador = contador;}
 
     @Override
     public String toString() {

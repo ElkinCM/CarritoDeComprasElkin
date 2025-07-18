@@ -1,5 +1,8 @@
 package ec.edu.ups.modelo;
 
+import ec.edu.ups.util.CedulaValidar;
+import ec.edu.ups.util.ContrasenaValidar;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -16,7 +19,8 @@ public class Usuario {
     private List<Carrito> carritos;
     private List<RespuestaSegu> respuestaSegu;
 
-    // Constructor completo original
+    // ===== CONSTRUCTORES =====
+
     public Usuario(String username, Rol rol, String contrasenia, String nombre, String correo, String telefono, GregorianCalendar fechaNacimiento) {
         this.username = username;
         this.rol = rol;
@@ -29,7 +33,6 @@ public class Usuario {
         this.respuestaSegu = new ArrayList<>();
     }
 
-    // Constructor que recibía correo en lugar de username
     public Usuario(String correo, Rol rol, String contrasenia) {
         this.correo = correo;
         this.rol = rol;
@@ -43,12 +46,21 @@ public class Usuario {
         this.respuestaSegu = new ArrayList<>();
     }
 
-    // Getters y Setters
+    public Usuario(String username) {
+        this.username = username;
+    }
+
+
+    // ===== GETTERS Y SETTERS =====
+
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(String username) throws CedulaValidar {
+        if (!esCedulaEcuatorianaValida(username)) {
+            throw new CedulaValidar("La cédula ingresada no es válida según el SRI.");
+        }
         this.username = username;
     }
 
@@ -64,8 +76,9 @@ public class Usuario {
         return contrasenia;
     }
 
-    public void setContrasenia(String password) {
-        this.contrasenia = password;
+    public void setContrasenia(String contrasenia) throws ContrasenaValidar{
+        validarContrasenia(contrasenia);
+        this.contrasenia = contrasenia;
     }
 
     public String getNombre() {
@@ -164,5 +177,50 @@ public class Usuario {
                 ", carritos=" + carritos +
                 ", respuestaSegu=" + respuestaSegu +
                 '}';
+    }
+
+    // ===== VALIDACIONES INTERNAS =====
+
+    private boolean esCedulaEcuatorianaValida(String cedula) {
+        if (cedula == null || !cedula.matches("\\d{10}")) return false;
+
+        int provincia = Integer.parseInt(cedula.substring(0, 2));
+        if (provincia < 1 || provincia > 24) return false;
+
+        int tercerDigito = Character.getNumericValue(cedula.charAt(2));
+        if (tercerDigito >= 6) return false;
+
+        int sumaPar = 0, sumaImpar = 0;
+        for (int i = 0; i < 9; i++) {
+            int digito = Character.getNumericValue(cedula.charAt(i));
+            if (i % 2 == 0) {
+                digito *= 2;
+                if (digito > 9) digito -= 9;
+                sumaImpar += digito;
+            } else {
+                sumaPar += digito;
+            }
+        }
+
+        int total = sumaPar + sumaImpar;
+        int decenaSuperior = ((total + 9) / 10) * 10;
+        int digitoVerificador = decenaSuperior - total;
+        if (digitoVerificador == 10) digitoVerificador = 0;
+
+        return digitoVerificador == Character.getNumericValue(cedula.charAt(9));
+    }
+
+    private void validarContrasenia(String password) throws ContrasenaValidar {
+        if (password.length() < 6)
+            throw new ContrasenaValidar("La contraseña debe tener al menos 6 caracteres");
+
+        if (!password.matches(".*[A-Z].*"))
+            throw new ContrasenaValidar("La contraseña debe contener al menos una letra mayúscula");
+
+        if (!password.matches(".*[a-z].*"))
+            throw new ContrasenaValidar("La contraseña debe contener al menos una letra minúscula");
+
+        if (!password.matches(".*[@_.-].*"))
+            throw new ContrasenaValidar("La contraseña debe contener al menos un carácter especial (@, _, -, .)");
     }
 }

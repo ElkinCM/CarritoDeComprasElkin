@@ -18,6 +18,12 @@ public class Carrito {
         this.usuario = usuario;
     }
 
+    public Carrito() {
+        this.items = new ArrayList<>();
+        this.codigo = contador++;
+        this.fecha = new GregorianCalendar();
+    }
+
     public int getCodigo() {
         return codigo;
     }
@@ -101,4 +107,3 @@ public class Carrito {
         return fecha.getTime();
     }
 }
-
