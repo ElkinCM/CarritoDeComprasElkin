@@ -12,7 +12,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.GregorianCalendar;
 import java.util.List;
-
+/**
+ * Controlador que gestiona la lógica relacionada con los usuarios,
+ * incluyendo creación, eliminación, modificación, listado e inicio de sesión.
+ * También maneja la internacionalización de los mensajes en las vistas.
+ */
 public class UsuarioController {
     private LoginView loginView;
     private UsuarioCrearView usuarioCrearView;
@@ -23,7 +27,17 @@ public class UsuarioController {
     private Usuario usuario;
     private UsuarioDAO usuarioDAO;
     private final MensajeInternacionalizacionHandler Internacionalizar;
-
+    /**
+     * Constructor principal del controlador para gestionar las operaciones de usuario.
+     *
+     * @param usuarioCrearView Vista para crear usuarios
+     * @param usuarioEliminarView Vista para eliminar usuarios
+     * @param usuarioListarView Vista para listar usuarios
+     * @param usuarioModificarView Vista para modificar usuarios
+     * @param usuario Objeto usuario actual
+     * @param usuarioDAO Objeto DAO para acceder a los datos de usuario
+     * @param internacionalizar Manejador de mensajes internacionalizados
+     */
     public UsuarioController(UsuarioCrearView usuarioCrearView, UsuarioEliminarView usuarioEliminarView,
                              UsuarioListarView usuarioListarView, UsuarioModificarView usuarioModificarView, Usuario usuario,
                              UsuarioDAO usuarioDAO, MensajeInternacionalizacionHandler internacionalizar) {
@@ -41,7 +55,13 @@ public class UsuarioController {
         configurarListarUsu();
         actualizarIdioma();
     }
-
+    /**
+     * Constructor del controlador utilizado específicamente para manejar el inicio de sesión.
+     *
+     * @param loginView Vista de login
+     * @param usuarioDAO DAO para autenticación
+     * @param internacionalizar Manejador de mensajes internacionalizados
+     */
     public UsuarioController(LoginView loginView, UsuarioDAO usuarioDAO, MensajeInternacionalizacionHandler internacionalizar){
         this.loginView = loginView;
         this.usuarioDAO = usuarioDAO;
@@ -49,12 +69,16 @@ public class UsuarioController {
 
         configurarLogin();
     }
-
+    /**
+     * Configura los eventos de los botones de la vista de login.
+     */
     private void configurarLogin() {
         loginView.getBtnIniciarSesion().addActionListener(e -> manejarInicioSesion());
         loginView.getBtnSalir().addActionListener(e -> salirDelSistema());
     }
-
+    /**
+     * Maneja el proceso de inicio de sesión, validando credenciales y mostrando mensajes.
+     */
     private void manejarInicioSesion() {
         String username = loginView.getTxtUsername().getText().trim();
         String password = loginView.getPsfContraseña().getText().trim();
@@ -74,12 +98,16 @@ public class UsuarioController {
 
         limpiarCamposLogIn();
     }
-
+    /**
+     * Limpia los campos del formulario de login después del intento de autenticación.
+     */
     private void limpiarCamposLogIn() {
         loginView.getTxtUsername().setText("");
         loginView.getPsfContraseña().setText("");
     }
-
+    /**
+     * Solicita confirmación y cierra el sistema si el usuario acepta.
+     */
     private void salirDelSistema() {
         int confirmacion = JOptionPane.showConfirmDialog(
                 null,
@@ -92,8 +120,10 @@ public class UsuarioController {
             System.exit(0);
         }
     }
-
-
+    /**
+     * Configura la lógica del botón "Crear" en la vista de creación de usuario.
+     * Valida los campos, crea un nuevo usuario si los datos son válidos y muestra los mensajes correspondientes.
+     */
     private void configurarAnadirUsu() {
         usuarioCrearView.getBtnCrear().addActionListener(e -> {
             String usuario = usuarioCrearView.getTxtUsuario().getText().trim();
@@ -153,7 +183,12 @@ public class UsuarioController {
             }
         });
     }
-
+    /**
+     * Convierte el nombre del mes a su valor entero correspondiente (0 = enero, ..., 11 = diciembre).
+     *
+     * @param mes Nombre del mes (en español).
+     * @return Índice del mes como entero.
+     */
     private int convertirMesAInt(String mes) {
         mes = mes.toLowerCase();
         switch (mes) {
@@ -172,8 +207,10 @@ public class UsuarioController {
             default: return 0; // También puedes lanzar una excepción si prefieres
         }
     }
-
-
+    /**
+     * Configura los eventos para modificar un usuario, dependiendo de su rol.
+     * Habilita búsqueda y actualización de datos.
+     */
     private void configurarModificarUsu() {
         if (usuario.getRol() == Rol.USUARIO) {
             configurarVistaParaUsuarioModificar(usuario);
@@ -182,8 +219,10 @@ public class UsuarioController {
         usuarioModificarView.getBtnBuscar().addActionListener(e -> buscarUsuarioNombreModificar());
         usuarioModificarView.getBtnModificar().addActionListener(e -> modificarUsuario());
     }
-
-
+    /**
+     * Configura los eventos para eliminar un usuario. Si el rol es USUARIO,
+     * carga automáticamente los datos del usuario actual.
+     */
     private void configurarEliminarUsu() {
         if (usuario.getRol() == Rol.USUARIO) {
             configurarVistaParaUsuario(usuario);
@@ -191,7 +230,9 @@ public class UsuarioController {
         usuarioEliminarView.getBtnBuscar().addActionListener(e -> buscarUsuarioNombre());
         usuarioEliminarView.getBtnEliminar().addActionListener(e -> eliminarUsuario());
     }
-
+    /**
+     * Configura los eventos de búsqueda y listado general de usuarios en la vista de lista.
+     */
     private void configurarListarUsu() {
         usuarioListarView.getBtnBuscar().addActionListener(new ActionListener() {
             @Override
@@ -219,7 +260,10 @@ public class UsuarioController {
             }
         });
     }
-
+    /**
+     * Actualiza el idioma de todas las vistas controladas por este controlador.
+     * Utiliza el idioma y país configurado en el manejador de internacionalización.
+     */
     public void actualizarIdioma() {
         if (usuarioCrearView != null) usuarioCrearView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
         if (usuarioEliminarView != null) usuarioEliminarView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
@@ -227,24 +271,41 @@ public class UsuarioController {
         if (usuarioModificarView != null) usuarioModificarView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
         if (loginView != null) loginView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
-
+    /**
+     * Cambia el idioma de la aplicación según los parámetros proporcionados.
+     *
+     * @param lenguaje Código del idioma (por ejemplo, "es").
+     * @param pais Código del país (por ejemplo, "EC").
+     */
     public void cambiarIdioma(String lenguaje, String pais) {
         Internacionalizar.setLenguaje(lenguaje, pais);
         actualizarIdioma();
     }
-
+    /**
+     * Configura la vista de eliminación para un usuario con rol USUARIO.
+     * Carga sus datos y bloquea campos para evitar su edición.
+     *
+     * @param usuario Usuario actual a cargar.
+     */
     private void configurarVistaParaUsuario(Usuario usuario) {
         deshabilitarBusqueda();
         cargarDatosEnCampos(usuario);
         bloquearCampos();
     }
-
+    /**
+     * Deshabilita la búsqueda manual en la vista de eliminación,
+     * útil cuando se muestra información del usuario actual.
+     */
     private void deshabilitarBusqueda() {
         usuarioEliminarView.getBtnBuscar().setEnabled(false);
         usuarioEliminarView.getBtnBuscar().setVisible(false);
         usuarioEliminarView.getTxtUsuario().setEnabled(false);
     }
-
+    /**
+     * Carga los datos de un usuario en los campos de la vista de eliminación.
+     *
+     * @param usuario Usuario cuyos datos serán cargados.
+     */
     private void cargarDatosEnCampos(Usuario usuario) {
         usuarioEliminarView.getTxtUsuario().setText(usuario.getUsername());
         usuarioEliminarView.getTxtContraseña().setText(usuario.getContrasenia());
@@ -255,7 +316,11 @@ public class UsuarioController {
 
         seleccionarFechaNacimiento(usuario);
     }
-
+    /**
+     * Establece la fecha de nacimiento en los combo boxes (día y mes) para vista de eliminación.
+     *
+     * @param usuario Usuario con la fecha de nacimiento.
+     */
     private void seleccionarFechaNacimiento(Usuario usuario) {
         try {
             int dia = Integer.parseInt(usuario.getDiaNacimientoString());
@@ -266,12 +331,17 @@ public class UsuarioController {
             // en caso de error, se omite la selección
         }
     }
-
+    /**
+     * Bloquea los combo boxes de fecha (día y mes) en la vista de eliminación.
+     */
     private void bloquearCampos() {
         usuarioEliminarView.getCbxDia().setEnabled(false);
         usuarioEliminarView.getCbxMes().setEnabled(false);
     }
-
+    /**
+     * Busca un usuario por nombre de usuario en la vista de eliminación.
+     * Muestra mensaje si no se encuentra o si el campo está vacío.
+     */
     private void buscarUsuarioNombre() {
         String username = usuarioEliminarView.getTxtUsuario().getText().trim();
         if (username.isEmpty()) {
@@ -286,19 +356,29 @@ public class UsuarioController {
             usuarioEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.noencontrado"));
         }
     }
-
+    /**
+     * Carga los datos del usuario en la vista de modificación si tiene rol USUARIO.
+     *
+     * @param usuario Usuario cuyos datos serán mostrados.
+     */
     private void configurarVistaParaUsuarioModificar(Usuario usuario) {
         deshabilitarBusquedaModificar();
         cargarDatosEnCamposModificar(usuario);
         bloquearCamposModificar();
     }
-
+    /**
+     * Desactiva campos de búsqueda en la vista de modificación.
+     */
     private void deshabilitarBusquedaModificar() {
         usuarioModificarView.getBtnBuscar().setEnabled(false);
         usuarioModificarView.getBtnBuscar().setVisible(false);
         usuarioModificarView.getTxtUsuario().setEnabled(false);
     }
-
+    /**
+     * Carga los datos del usuario en la vista de modificación.
+     *
+     * @param usuario Usuario cuyos datos serán mostrados.
+     */
     private void cargarDatosEnCamposModificar(Usuario usuario) {
         usuarioModificarView.getTxtUsuario().setText(usuario.getUsername());
         usuarioModificarView.getTxtContraseña().setText(usuario.getContrasenia());
@@ -309,7 +389,11 @@ public class UsuarioController {
 
         seleccionarFechaNacimientoModificar(usuario);
     }
-
+    /**
+     * Establece la fecha de nacimiento en los combo boxes (día y mes) para vista de modificación.
+     *
+     * @param usuario Usuario con la fecha de nacimiento.
+     */
     private void seleccionarFechaNacimientoModificar(Usuario usuario) {
         try {
             int dia = Integer.parseInt(usuario.getDiaNacimientoString());
@@ -320,12 +404,17 @@ public class UsuarioController {
             // Silenciar error en caso de datos inválidos
         }
     }
-
+    /**
+     * Bloquea los combo boxes de fecha (día y mes) en la vista de modificación.
+     */
     private void bloquearCamposModificar() {
         usuarioModificarView.getCbxDia().setEnabled(false);
         usuarioModificarView.getCbxMes().setEnabled(false);
     }
-
+    /**
+     * Busca un usuario en la base de datos desde la vista de modificación.
+     * Muestra los datos si lo encuentra, o un mensaje de error si no.
+     */
     private void buscarUsuarioNombreModificar() {
         String username = usuarioModificarView.getTxtUsuario().getText().trim();
 
@@ -342,7 +431,10 @@ public class UsuarioController {
             usuarioModificarView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.noencontrado"));
         }
     }
-
+    /**
+     * Modifica un usuario existente con los datos ingresados en la vista de modificación.
+     * Valida los datos ingresados antes de actualizar.
+     */
     private void modificarUsuario() {
         String username = usuarioModificarView.getTxtUsuario().getText().trim();
         String password = usuarioModificarView.getTxtContraseña().getText().trim();
@@ -394,7 +486,10 @@ public class UsuarioController {
             usuarioModificarView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.noencontrado"));
         }
     }
-
+    /**
+     * Elimina un usuario de la base de datos tras confirmar con el usuario.
+     * Muestra mensaje de éxito o error, y limpia los campos si es necesario.
+     */
     private void eliminarUsuario() {
         String username = usuarioEliminarView.getTxtUsuario().getText().trim();
         Usuario usuario = usuarioDAO.buscarPorUsuario(username);
@@ -425,7 +520,11 @@ public class UsuarioController {
             usuarioEliminarView.mostrarMensaje(Internacionalizar.get("mensaje.cancelar"));
         }
     }
-
+    /**
+     * Retorna el usuario actual que está usando la aplicación.
+     *
+     * @return Usuario logueado actualmente.
+     */
     public Usuario getUsuario(){
         return usuario;
     }

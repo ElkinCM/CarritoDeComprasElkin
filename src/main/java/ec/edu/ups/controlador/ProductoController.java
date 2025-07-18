@@ -14,7 +14,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Locale;
-
+/**
+ * Controlador de productos que gestiona la interacción entre las vistas de productos
+ * y la lógica del modelo. Permite añadir, modificar, eliminar y listar productos.
+ * También permite la actualización del idioma de las vistas.
+ *
+ */
 public class ProductoController {
 
     private ProductoAnadirView productoAnadirView;
@@ -25,7 +30,16 @@ public class ProductoController {
     private final ProductoDAO productoDAO;
     private final MensajeInternacionalizacionHandler Internacionalizar;
     private Locale locale;
-
+    /**
+     * Constructor del controlador que inicializa las vistas y configura sus eventos.
+     *
+     * @param productoAnadirView Vista para añadir productos.
+     * @param productoListaView Vista para listar productos.
+     * @param productoEliminarView Vista para eliminar productos.
+     * @param productoModificarView Vista para modificar productos.
+     * @param productoDAO DAO para el acceso a datos de productos.
+     * @param internacionalizar Manejador de internacionalización de mensajes.
+     */
     public ProductoController(ProductoAnadirView productoAnadirView, ProductoListaView productoListaView,
                               ProductoEliminarView productoEliminarView, ProductoModificarView productoModificarView,
                               ProductoDAO productoDAO, MensajeInternacionalizacionHandler internacionalizar) {
@@ -43,10 +57,15 @@ public class ProductoController {
         actualizarIdioma();
     }
 
+    /**
+     * Configura el evento para añadir un nuevo producto.
+     */
     private void configurarAnadirPro() {
         productoAnadirView.getBtnAceptar().addActionListener(e -> guardarProducto());
     }
-
+    /**
+     * Configura los eventos de búsqueda y modificación de productos.
+     */
     private void configurarModificarPro() {
         productoModificarView.getBtnBuscar().addActionListener(e -> {
             String codigoTexto = productoModificarView.getTxtCodigo().getText().trim();
@@ -91,7 +110,9 @@ public class ProductoController {
             }
         });
     }
-
+    /**
+     * Configura los eventos de búsqueda y eliminación de productos.
+     */
     private void configurarEliminarPro() {
         productoEliminarView.getBtnBuscar().addActionListener(new ActionListener() {
         @Override
@@ -155,7 +176,9 @@ public class ProductoController {
             }
         });
     }
-
+    /**
+     * Configura los eventos para buscar productos por nombre o listar todos.
+     */
     private void configurarListarPro(){
         productoListaView.getBtnBuscar().addActionListener(new ActionListener() {
         @Override
@@ -189,6 +212,9 @@ public class ProductoController {
             }
         });
     }
+    /**
+     * Guarda un nuevo producto en el sistema.
+     */
     private void guardarProducto() {
         try {
             String codigoTexto = productoAnadirView.getTxtCodigo().getText().trim();
@@ -213,7 +239,11 @@ public class ProductoController {
             productoAnadirView.mostrarMensaje(Internacionalizar.get("mensaje.datos.invalidos"));
         }
     }
-
+    /**
+     * Actualiza un producto existente.
+     *
+     * @param codigo Código del producto a actualizar.
+     */
     private void actualizar(int codigo) {
         Producto producto = productoDAO.buscarPorCodigo(codigo);
 
@@ -240,17 +270,28 @@ public class ProductoController {
             productoModificarView.mostrarMensaje(Internacionalizar.get("mensaje.producto.precio.invalido"));
         }
     }
-
+    /**
+     * Elimina un producto por su código.
+     *
+     * @param codigo Código del producto a eliminar.
+     */
     private void eliminar(int codigo) {
         productoDAO.eliminar(codigo);
     }
-
+    /**
+     * Actualiza el idioma de todas las vistas del controlador.
+     */
     private void actualizarIdioma() {
         productoAnadirView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
         productoListaView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
         productoEliminarView.actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
-
+    /**
+     * Cambia el idioma del sistema.
+     *
+     * @param lenguaje Código de lenguaje (por ejemplo, "es").
+     * @param pais Código de país (por ejemplo, "EC").
+     */
     public void cambiarIdioma(String lenguaje, String pais) {
         Internacionalizar.setLenguaje(lenguaje, pais);
         this.locale = Internacionalizar.getLocale();
