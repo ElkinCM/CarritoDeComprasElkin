@@ -26,14 +26,34 @@ import ec.edu.ups.vista.Usuario.UsuarioEliminarView;
 import ec.edu.ups.vista.Usuario.UsuarioListarView;
 import ec.edu.ups.vista.Usuario.UsuarioModificarView;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+/**
+ * Clase principal que inicia la aplicación y gestiona la selección del modo
+ * de almacenamiento (memoria o archivo), así como la internacionalización de la interfaz.
+ * <p>
+ * Presenta una ventana inicial para que el usuario seleccione dónde se almacenarán los datos.
+ * Además, permite cambiar el idioma de la interfaz mediante un menú.
+ * </p>
+ *
+ * @author
+ */
 public class Main {
+    /**
+     * Método principal que inicia la aplicación.
+     * <p>
+     * Muestra la ventana inicial para seleccionar el modo de almacenamiento
+     * y configura el idioma inicial de la aplicación.
+     * </p>
+     *
+     * @param args argumentos de línea de comandos (no utilizados)
+     */
     public static void main(String[] args) {
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
                 MensajeInternacionalizacionHandler Internacionalizar = new MensajeInternacionalizacionHandler("es", "EC");
                 GuardarArchivo guardarArchivo = new GuardarArchivo(Internacionalizar);
@@ -89,7 +109,19 @@ public class Main {
             }
         });
     }
-
+    /**
+     * Método para iniciar la aplicación con los DAOs y configuraciones indicadas.
+     * <p>
+     * Este método debe inicializar controladores, vistas y cualquier configuración
+     * necesaria para que la aplicación funcione.
+     * </p>
+     *
+     * @param usuarioDAO    implementación de {@link UsuarioDAO}
+     * @param productoDAO   implementación de {@link ProductoDAO}
+     * @param carritoDAO    implementación de {@link CarritoDAO}
+     * @param preguntaDAO   implementación de {@link PreguntaDAO}
+     * @param Internacionalizar handler para internacionalización de mensajes
+     */
     private static void iniciarApp(UsuarioDAO usuarioDAO, ProductoDAO productoDAO, CarritoDAO carritoDAO,
                                    PreguntaDAO preguntaDAO, MensajeInternacionalizacionHandler Internacionalizar) {
         LoginView loginView = new LoginView(Internacionalizar);
@@ -97,7 +129,15 @@ public class Main {
         RecuperarView recuperarView = new RecuperarView(Internacionalizar);
         UsuarioController usuarioController = new UsuarioController(loginView, usuarioDAO, Internacionalizar);
         PreguntaController preguntaController = new PreguntaController(usuarioDAO, loginView, registrarView, preguntaDAO, recuperarView, Internacionalizar);
-
+        /**
+         * Método que configura la internacionalización para las vistas de login, registrar y recuperar,
+         * además de manejar la apertura de la ventana principal tras la autenticación exitosa.
+         * <p>
+         * Se agregan ActionListener para cambiar idioma (Español, Inglés, Francés) en las vistas y controladores,
+         * y se gestionan los eventos de la ventana de login cerrada para iniciar el menú principal
+         * y sus vistas y controladores asociados.
+         * </p>
+         */
         loginView.getMenuItemEspañol().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -175,7 +215,17 @@ public class Main {
         loginView.setVisible(true);
 
         loginView.addWindowListener(new WindowAdapter() {
-
+            /**
+             * Método que se ejecuta cuando la ventana loginView se cierra.
+             * <p>
+             * Verifica el usuario autenticado y, si existe, crea e inicializa
+             * la ventana principal con todas las vistas y controladores.
+             * También configura los listeners para el menú principal y
+             * las acciones de internacionalización y cierre de sesión.
+             * </p>
+             *
+             * @param e evento de ventana cerrado
+             */
             @Override
             public void windowClosed(WindowEvent e) {
 
@@ -355,7 +405,7 @@ public class Main {
                         }
                     });
 
-                    //INTERNACIONALIZACION
+                    //INTERNACIONALIZACIONo
 
                     menuPrincipalView.getMenuItemEspañol().addActionListener(new ActionListener() {
                         @Override
