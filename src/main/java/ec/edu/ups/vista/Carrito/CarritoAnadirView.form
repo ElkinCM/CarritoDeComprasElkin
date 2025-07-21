@@ -18,7 +18,8 @@
         <properties>
           <background color="-2228241"/>
         </properties>
-        <border type="line" title="">
+        <border type="line" title="Producto">
+          <font/>
           <color color="-16777216"/>
         </border>
         <children>
@@ -161,7 +162,7 @@
         <properties>
           <background color="-2228241"/>
         </properties>
-        <border type="none" title=""/>
+        <border type="none" title="Detalles"/>
         <children>
           <component id="f89a2" class="javax.swing.JTextField" binding="txtSubtotal">
             <constraints>

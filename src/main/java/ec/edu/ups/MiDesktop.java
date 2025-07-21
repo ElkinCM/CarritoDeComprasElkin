@@ -2,7 +2,13 @@ package ec.edu.ups;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.*;
+import java.util.Random;
 
+/**
+ * Fondo visual inspirado en música electrónica: colores neón, ondas de sonido,
+ * sintetizadores y partículas digitales.
+ */
 public class MiDesktop extends JDesktopPane {
 
     @Override
@@ -13,67 +19,64 @@ public class MiDesktop extends JDesktopPane {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
+
         int width = getWidth();
         int height = getHeight();
 
-        // Fondo dividido: azul oscuro arriba, púrpura abajo
-        g2.setColor(new Color(40, 40, 80));
-        g2.fillRect(0, 0, width, height / 2);
-        g2.setColor(new Color(100, 60, 140));
-        g2.fillRect(0, height / 2, width, height / 2);
+        // Fondo degradado púrpura a azul oscuro
+        GradientPaint fondo = new GradientPaint(0, 0, new Color(70, 0, 100), 0, height, new Color(0, 0, 60));
+        g2.setPaint(fondo);
+        g2.fillRect(0, 0, width, height);
 
-        // Texto principal
-        String texto = "JAVA MUSIC STUDIO";
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("SansSerif", Font.BOLD, 32));
-        int textWidth = g2.getFontMetrics().stringWidth(texto);
-        g2.drawString(texto, (width - textWidth) / 2, height - 30);
-
-        // 🎹 Dibujo de piano en la parte inferior
-        int pianoX = width / 2 - 200;
-        int pianoY = height - 150;
-        int pianoWidth = 400;
-        int pianoHeight = 80;
-
-        // Base del piano
-        g2.setColor(new Color(30, 30, 30));
-        g2.fillRoundRect(pianoX, pianoY, pianoWidth, pianoHeight, 20, 20);
-
-        // Teclas blancas
-        g2.setColor(Color.WHITE);
-        int numKeys = 10;
-        int keyWidth = pianoWidth / numKeys;
-        for (int i = 0; i < numKeys; i++) {
-            g2.fillRect(pianoX + i * keyWidth, pianoY, keyWidth - 2, pianoHeight);
-            g2.setColor(Color.BLACK);
-            g2.drawRect(pianoX + i * keyWidth, pianoY, keyWidth - 2, pianoHeight);
-            g2.setColor(Color.WHITE);
+        // Dibujar partículas flotantes (círculos pequeños)
+        Random rand = new Random();
+        for (int i = 0; i < 100; i++) {
+            int px = rand.nextInt(width);
+            int py = rand.nextInt(height);
+            int size = rand.nextInt(4) + 2;
+            g2.setColor(new Color(255, 255, 255, rand.nextInt(100) + 50));
+            g2.fillOval(px, py, size, size);
         }
 
-        // Teclas negras (simplificadas)
-        g2.setColor(Color.BLACK);
-        for (int i = 0; i < numKeys - 1; i++) {
-            if (i % 7 != 2 && i % 7 != 6) {
-                g2.fillRect(pianoX + i * keyWidth + keyWidth / 2, pianoY, keyWidth / 2, pianoHeight / 2);
+        // Ondas de sonido horizontales
+        g2.setStroke(new BasicStroke(2));
+        for (int y = height / 3; y <= 2 * height / 3; y += 40) {
+            g2.setColor(new Color(0, 255, 200, 120));
+            for (int x = 0; x < width; x += 20) {
+                int waveHeight = (int) (10 * Math.sin(x * 0.05 + y * 0.1));
+                g2.drawLine(x, y, x, y + waveHeight);
             }
         }
 
-        // 🎧 Auriculares en la izquierda
-        int earX = width / 4 - 50;
-        int earY = height / 3;
-        g2.setColor(new Color(60, 60, 60));
-        g2.fillOval(earX, earY, 50, 100);
-        g2.fillOval(earX + 100, earY, 50, 100);
-        g2.setStroke(new BasicStroke(10));
-        g2.drawArc(earX + 20, earY - 40, 110, 100, 0, 180);
+        // Líneas de energía diagonales
+        g2.setColor(new Color(0, 255, 255, 60));
+        g2.setStroke(new BasicStroke(1));
+        for (int i = -width; i < width; i += 40) {
+            g2.drawLine(i, 0, i + width, height);
+        }
 
-        // 🎵 Nota musical central
-        int noteX = width / 2 - 30;
-        int noteY = height / 2 - 100;
-        g2.setColor(Color.YELLOW);
-        g2.fillOval(noteX, noteY, 40, 40); // Cabeza
-        g2.fillRect(noteX + 25, noteY - 80, 10, 90); // Palo
-        g2.fillArc(noteX + 20, noteY - 100, 40, 40, 0, 180); // Bandera
+        // Dibujar sintetizador abstracto en el centro
+        int synthX = width / 2 - 100;
+        int synthY = height / 2 - 50;
+        g2.setColor(new Color(20, 20, 20));
+        g2.fillRoundRect(synthX, synthY, 200, 100, 20, 20);
+
+        // Teclas o pads iluminados
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 2; j++) {
+                int padX = synthX + 20 + i * 40;
+                int padY = synthY + 20 + j * 30;
+                g2.setColor(new Color(rand.nextInt(100) + 155, rand.nextInt(255), 255));
+                g2.fillRect(padX, padY, 30, 20);
+            }
+        }
+
+        // Texto centrado
+        g2.setFont(new Font("Consolas", Font.BOLD, 30));
+        g2.setColor(Color.CYAN);
+        String texto = "ELECTRONIC PULSE";
+        int textWidth = g2.getFontMetrics().stringWidth(texto);
+        g2.drawString(texto, (width - textWidth) / 2, 60);
 
         g2.dispose();
     }
