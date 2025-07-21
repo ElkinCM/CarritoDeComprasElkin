@@ -229,6 +229,12 @@ public class ProductoController {
             int codigo = Integer.parseInt(codigoTexto);
             double precio = Double.parseDouble(precioTexto);
 
+            // Validar si código ya existe
+            if (productoDAO.buscarPorCodigo(codigo) != null) {
+                productoAnadirView.mostrarMensaje(Internacionalizar.get("mensaje.codigo.existe"));
+                return;
+            }
+
             Producto nuevoProducto = new Producto(codigo, nombre, precio);
             productoDAO.crear(nuevoProducto);
 
@@ -239,6 +245,7 @@ public class ProductoController {
             productoAnadirView.mostrarMensaje(Internacionalizar.get("mensaje.datos.invalidos"));
         }
     }
+
     /**
      * Actualiza un producto existente.
      *

@@ -1,4 +1,4 @@
-package ec.edu.ups.dao.impl;
+package ec.edu.ups.dao.impl.DAOCarrito;
 
 import ec.edu.ups.dao.CarritoDAO;
 import ec.edu.ups.modelo.Carrito;
@@ -184,7 +184,7 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
      * @return Objeto Carrito representado por la línea.
      */
     private Carrito CarritoString(String s, Usuario usuario) {
-        String[] partes = s.split("_");
+        String[] partes = s.split(" | ");
         if (partes.length < 4) {
             return null;
         }
@@ -201,7 +201,7 @@ public class CarritoDAOArchivoTexto implements CarritoDAO {
         long fechaMillis = Long.parseLong(partes[2]);
         String itemsStr = partes[3];
 
-        if (itemsStr.startsWith("[") && itemsStr.endsWith("]")) {
+        if (itemsStr.startsWith("[ ") && itemsStr.endsWith(" ]")) {
             itemsStr = itemsStr.substring(1, itemsStr.length() - 1);
         }
 

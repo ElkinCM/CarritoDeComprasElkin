@@ -1,4 +1,4 @@
-package ec.edu.ups.dao.impl;
+package ec.edu.ups.dao.impl.DAOUsuario;
 
 import ec.edu.ups.dao.UsuarioDAO;
 import ec.edu.ups.modelo.Rol;
@@ -27,8 +27,12 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
     public UsuarioDAOMemoria() {
         usuarios = new ArrayList<>();
         // Usuarios por defecto
-        crear(new Usuario("admin", Rol.ADMINISTRADOR, "12345", "Administrador", "admin@dominio.com", "1234567890", null));
-        crear(new Usuario("usuario", Rol.USUARIO, "12345", "Usuario", "usuario@dominio.com", "0987654321", null));
+        try {
+            crear(new Usuario("0107113474", Rol.ADMINISTRADOR, "Admin1@", "Administrador", "admin@dominio.com", "1234567890", null));
+        } catch (Exception e) {
+            System.err.println("Error creando usuario por defecto: " + e.getMessage());
+        }
+
     }
 
     /**

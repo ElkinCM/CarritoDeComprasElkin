@@ -6,6 +6,8 @@ import ec.edu.ups.modelo.Pregunta;
 import ec.edu.ups.modelo.RespuestaSegu;
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
+import ec.edu.ups.util.CedulaValidar;
+import ec.edu.ups.util.ContrasenaValidar;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import ec.edu.ups.vista.LoginView;
 import ec.edu.ups.vista.Registrarse.RecuperarView;
@@ -105,10 +107,11 @@ public class PreguntaController {
         registraseView.getBtnRegistar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                if(preguntasRespondidas.size() < 3){
+                if (preguntasRespondidas.size() < 3) {
                     registraseView.mostrarMensaje(Internacionalizar.get("registro.preguntas.requeridas"));
                     return;
                 }
+                // Validar campos vacíos
                 if (registraseView.getTxtUsuario().getText().isEmpty() ||
                         registraseView.getTxtContrasenia().getText().isEmpty() ||
                         registraseView.getTxtNombre().getText().isEmpty() ||
@@ -116,67 +119,58 @@ public class PreguntaController {
                         registraseView.getTxtCorreo().getText().isEmpty() ||
                         registraseView.getTxtAnio().getText().isEmpty() ||
                         registraseView.getCbxDia().getSelectedItem() == null ||
-                        registraseView.getCbxMes().getSelectedItem() == null ) {
+                        registraseView.getCbxMes().getSelectedItem() == null) {
                     registraseView.mostrarMensaje(Internacionalizar.get("mensaje.completar.campos"));
                     return;
                 }
+                // Validar usuario existente
                 if (usuarioDAO.buscarPorUsuario(registraseView.getTxtUsuario().getText()) != null) {
                     registraseView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.existe"));
                     return;
                 }
+
                 String usuario = registraseView.getTxtUsuario().getText();
                 String contrasenia = registraseView.getTxtContrasenia().getText();
                 String nombre = registraseView.getTxtNombre().getText();
                 String telefono = registraseView.getTxtTelefono().getText();
                 String correo = registraseView.getTxtCorreo().getText();
-                GregorianCalendar fecha = new GregorianCalendar();
-                int dia =(Integer) registraseView.getCbxDia().getSelectedItem();
-                int mes = -1;
+
+                int dia = (Integer) registraseView.getCbxDia().getSelectedItem();
                 String mesSeleccionado = (String) registraseView.getCbxMes().getSelectedItem();
-                if (mesSeleccionado.equals(Internacionalizar.get("mes.enero"))) {
-                    mes = 0;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.febrero"))) {
-                    mes = 1;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.marzo"))) {
-                    mes = 2;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.abril"))) {
-                    mes = 3;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.mayo"))) {
-                    mes = 4;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.junio"))) {
-                    mes = 5;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.julio"))) {
-                    mes = 6;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.agosto"))) {
-                    mes = 7;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.septiembre"))) {
-                    mes = 8;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.octubre"))) {
-                    mes = 9;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.noviembre"))) {
-                    mes = 10;
-                } else if (mesSeleccionado.equals(Internacionalizar.get("mes.diciembre"))) {
-                    mes = 11;
-                } else {
+                int mes = obtenerIndiceMes(mesSeleccionado);
+                if (mes == -1) {
                     registraseView.mostrarMensaje(Internacionalizar.get("mes.invalido"));
                     return;
                 }
-                int anio = Integer.parseInt(registraseView.getTxtAnio().getText()) ;
-                fecha.set(anio, mes, dia);
+                int anio = Integer.parseInt(registraseView.getTxtAnio().getText());
+                GregorianCalendar fecha = new GregorianCalendar(anio, mes, dia);
 
-                registraseView.vaciarCampo();
+                try {
+                    Usuario usuario1 = new Usuario(usuario, Rol.USUARIO, contrasenia, nombre, correo, telefono, fecha);
+                    usuario1.setRespuestaSegu(preguntasRespondidas);
+                    usuarioDAO.crear(usuario1);
 
-                Usuario usuario1 =  new Usuario(usuario, Rol.USUARIO, contrasenia,
-                        nombre, correo, telefono, fecha);
-                usuario1.setRespuestaSegu(preguntasRespondidas);
-                usuarioDAO.crear(usuario1);
-                registraseView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.creado"));
-                loginView.setVisible(true);
-                registraseView.dispose();
-                cont = 1;
-                contadorPreguntasRespondidas[0] = 0;
+                    registraseView.vaciarCampo();
+                    registraseView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.creado"));
+                    loginView.setVisible(true);
+                    registraseView.dispose();
+
+                    cont = 1;
+                    contadorPreguntasRespondidas[0] = 0;
+                } catch (CedulaValidar ex) {
+                    registraseView.mostrarMensaje(Internacionalizar.get("mensaje.cedula.invalida") + ": " + ex.getMessage());
+                } catch (ContrasenaValidar ex) {
+                    registraseView.mostrarMensaje(Internacionalizar.get("mensaje.contraseña.invalida") + ": " + ex.getMessage());
+                } catch (NumberFormatException ex) {
+                    registraseView.mostrarMensaje(Internacionalizar.get("mensaje.anio.invalido"));
+                } catch (Exception ex) {
+                    registraseView.mostrarMensaje(Internacionalizar.get("mensaje.error.general") + ": " + ex.getMessage());
+                }
+
             }
         });
+
+
 
         registraseView.getBtnGuardar().addActionListener(new ActionListener() {
             @Override
@@ -325,5 +319,24 @@ public class PreguntaController {
             button.removeActionListener(al);
         }
     }
+
+    private int obtenerIndiceMes(String mesSeleccionado) {
+        Map<String, Integer> meses = new HashMap<>();
+        meses.put(Internacionalizar.get("mes.enero"), 0);
+        meses.put(Internacionalizar.get("mes.febrero"), 1);
+        meses.put(Internacionalizar.get("mes.marzo"), 2);
+        meses.put(Internacionalizar.get("mes.abril"), 3);
+        meses.put(Internacionalizar.get("mes.mayo"), 4);
+        meses.put(Internacionalizar.get("mes.junio"), 5);
+        meses.put(Internacionalizar.get("mes.julio"), 6);
+        meses.put(Internacionalizar.get("mes.agosto"), 7);
+        meses.put(Internacionalizar.get("mes.septiembre"), 8);
+        meses.put(Internacionalizar.get("mes.octubre"), 9);
+        meses.put(Internacionalizar.get("mes.noviembre"), 10);
+        meses.put(Internacionalizar.get("mes.diciembre"), 11);
+
+        return meses.getOrDefault(mesSeleccionado, -1);
+    }
+
 
 }

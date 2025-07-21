@@ -493,7 +493,9 @@ public class CarritoController {
                         return;
                     }
 
-                    int codigoCarrito = (Integer) carritoListarView.getTblCarritos().getValueAt(filaSeleccionada, 0);
+                    String valor = carritoListarView.getTblCarritos().getValueAt(filaSeleccionada, 0).toString();
+                    int codigoCarrito = Integer.parseInt(valor);
+
                     Carrito carritoEncontrado = carritoDAO.buscarPorCodigo(codigoCarrito);
 
                     if (carritoEncontrado == null) {
@@ -512,6 +514,7 @@ public class CarritoController {
                 }
             }
         });
+
     }
     /**
      * Verifica si un producto ya existe en el carrito.

@@ -1,4 +1,4 @@
-package ec.edu.ups.dao.impl;
+package ec.edu.ups.dao.impl.DAOProducto;
 
 import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.modelo.Producto;
@@ -63,6 +63,19 @@ public class ProductoDAOArchivoBinario implements ProductoDAO {
      */
     @Override
     public void crear(Producto producto) {
+        if (producto == null || producto.getCodigo() <= 0) {
+            System.out.println("Producto inválido.");
+            return;
+        }
+
+        // Verificar si el código ya existe
+        Producto existente = buscarPorCodigo(producto.getCodigo());
+        if (existente != null) {
+            System.out.println("Código ya existente. Por favor, ingrese otro.");
+            return;
+        }
+
+        // Crear el producto porque no está duplicado
         try (RandomAccessFile raf = new RandomAccessFile(rutaArchivo, "rw")) {
             raf.seek(raf.length());
             crear(raf, producto);
@@ -70,6 +83,7 @@ public class ProductoDAOArchivoBinario implements ProductoDAO {
             System.out.println("Error al crear producto: " + e.getMessage());
         }
     }
+
     /**
      * Escribe un producto en el archivo.
      *

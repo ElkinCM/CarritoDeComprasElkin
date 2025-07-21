@@ -231,4 +231,26 @@ public class Carrito {
     public Date getFechaCrear() {
         return fecha.getTime();
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(codigo).append("_");
+        sb.append(usuario != null ? usuario.getUsername() : "null").append("_");
+        sb.append(fecha.getTimeInMillis()).append("_");
+        sb.append("[");
+        for (int i = 0; i < items.size(); i++) {
+            ItemCarrito item = items.get(i);
+            sb.append(item.getProducto().getCodigo()).append(";")
+                    .append(item.getProducto().getNombre()).append(";")
+                    .append(item.getProducto().getPrecio()).append(";")
+                    .append(item.getCantidad());
+            if (i < items.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
 }

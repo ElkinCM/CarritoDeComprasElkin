@@ -8,7 +8,14 @@ import ec.edu.ups.dao.CarritoDAO;
 import ec.edu.ups.dao.PreguntaDAO;
 import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.dao.UsuarioDAO;
-import ec.edu.ups.dao.impl.*;
+import ec.edu.ups.dao.impl.DAOCarrito.CarritoDAOArchivoTexto;
+import ec.edu.ups.dao.impl.DAOCarrito.CarritoDAOMemoria;
+import ec.edu.ups.dao.impl.DAOPregunta.PreguntaDAOArchivoBinario;
+import ec.edu.ups.dao.impl.DAOPregunta.PreguntaDAOMemoria;
+import ec.edu.ups.dao.impl.DAOProducto.ProductoDAOArchivoBinario;
+import ec.edu.ups.dao.impl.DAOProducto.ProductoDAOMemoria;
+import ec.edu.ups.dao.impl.DAOUsuario.UsuarioDAOArchivoTexto;
+import ec.edu.ups.dao.impl.DAOUsuario.UsuarioDAOMemoria;
 import ec.edu.ups.modelo.Carrito;
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
@@ -39,7 +46,7 @@ import java.awt.event.WindowEvent;
  * Además, permite cambiar el idioma de la interfaz mediante un menú.
  * </p>
  *
- * @author
+ * @author Elkin Chamba
  */
 public class Main {
     /**
@@ -76,9 +83,13 @@ public class Main {
                         guardarArchivo.setVisible(false);
                         String ruta = guardarArchivo.RutaArchivo();
                         UsuarioDAO usuarioDAO = new UsuarioDAOArchivoTexto(ruta);
+
                         ProductoDAO productoDAO = new ProductoDAOArchivoBinario(ruta);
+
                         CarritoDAO carritoDAO = new CarritoDAOArchivoTexto(ruta);
+
                         PreguntaDAO preguntaDAO = new PreguntaDAOArchivoBinario(ruta);
+
                         iniciarApp(usuarioDAO, productoDAO, carritoDAO, preguntaDAO, Internacionalizar);
                     }
                 });
@@ -146,6 +157,7 @@ public class Main {
                 preguntaController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
             }
         });
+
         loginView.getMenuItemIngles().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -154,6 +166,7 @@ public class Main {
                 preguntaController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
             }
         });
+
         loginView.getMenuItemFrances().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -172,6 +185,7 @@ public class Main {
                 preguntaController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
             }
         });
+
         registrarView.getMenuItemIngles().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -180,6 +194,7 @@ public class Main {
                 preguntaController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
             }
         });
+
         registrarView.getMenuItemFrances().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -188,6 +203,7 @@ public class Main {
                 preguntaController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
             }
         });
+
         recuperarView.getMenuItemEspañol().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -196,6 +212,7 @@ public class Main {
                 preguntaController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
             }
         });
+
         recuperarView.getMenuItemIngles().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -204,6 +221,7 @@ public class Main {
                 preguntaController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
             }
         });
+
         recuperarView.getMenuItemFrances().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -212,6 +230,7 @@ public class Main {
                 preguntaController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
             }
         });
+
         loginView.setVisible(true);
 
         loginView.addWindowListener(new WindowAdapter() {
@@ -278,7 +297,6 @@ public class Main {
                     }
 
                     // Configurar eventos de la vista del menu principal
-
                     //PRODUCTO
 
                     menuPrincipalView.getMenuItemCrearProducto().addActionListener(new ActionListener() {
@@ -440,7 +458,6 @@ public class Main {
                             usuarioController.cambiarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
                         }
                     });
-
 
                     menuPrincipalView.getMenuItemCerrarSesion().addActionListener(new ActionListener() {
                         @Override

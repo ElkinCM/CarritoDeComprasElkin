@@ -1,4 +1,4 @@
-package ec.edu.ups.dao.impl;
+package ec.edu.ups.dao.impl.DAOPregunta;
 
 import ec.edu.ups.dao.PreguntaDAO;
 import ec.edu.ups.modelo.Pregunta;

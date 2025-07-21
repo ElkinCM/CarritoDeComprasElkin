@@ -1,4 +1,4 @@
-package ec.edu.ups.dao.impl;
+package ec.edu.ups.dao.impl.DAOProducto;
 
 import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.modelo.Producto;
@@ -11,27 +11,54 @@ import java.util.List;
  * Implementación en memoria del DAO para la entidad {@link Producto}.
  * Utiliza una lista local para almacenar productos simulando una base de datos.
  * Permite operaciones CRUD y búsqueda por nombre o código.
- *
- * @author
  */
 public class ProductoDAOMemoria implements ProductoDAO {
 
     private List<Producto> productos;
 
     /**
-     * Constructor por defecto. Inicializa la lista de productos.
+     * Constructor por defecto.
+     * Inicializa la lista de productos y agrega productos de ejemplo.
      */
     public ProductoDAOMemoria() {
-        productos = new ArrayList<Producto>();
+        productos = new ArrayList<>();
+        inicializarProductosEjemplo();
+    }
+
+    /**
+     * Inicializa la lista con productos de ejemplo.
+     */
+    private void inicializarProductosEjemplo() {
+        productos.add(new Producto(1, "Cámara", 350.0));
+        productos.add(new Producto(2, "Smartwatch", 220.0));
+        productos.add(new Producto(3, "Altavoz Bluetooth", 180.0));
+        productos.add(new Producto(4, "Disco Duro", 90.0));
+        productos.add(new Producto(5, "Router WiFi", 130.0));
+        productos.add(new Producto(6, "Drone", 800.0));
+        productos.add(new Producto(7, "Consola", 400.0));
+        productos.add(new Producto(8, "Proyector", 270.0));
+        productos.add(new Producto(9, "Lámpara LED", 60.0));
+        productos.add(new Producto(10, "Teclado Mecánico", 110.0));
     }
 
     /**
      * Agrega un nuevo producto a la lista.
+     * Lanza IllegalArgumentException si el producto es nulo,
+     * tiene código inválido o el código ya existe.
      *
      * @param producto El objeto {@link Producto} que se desea agregar.
      */
     @Override
     public void crear(Producto producto) {
+        if (producto == null) {
+            throw new IllegalArgumentException("El producto no puede ser nulo.");
+        }
+        if (producto.getCodigo() <= 0) {
+            throw new IllegalArgumentException("El código del producto debe ser mayor a 0.");
+        }
+        if (buscarPorCodigo(producto.getCodigo()) != null) {
+            throw new IllegalArgumentException("Código ya existente. Por favor, ingrese otro código.");
+        }
         productos.add(producto);
     }
 

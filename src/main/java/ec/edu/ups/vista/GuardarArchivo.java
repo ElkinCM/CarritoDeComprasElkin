@@ -26,7 +26,7 @@ public class GuardarArchivo extends JFrame {
         super(internacionalizar.get("guardar.archivo.menu"));
         this.Internacionalizar = internacionalizar;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(300, 250);
+        setSize(300, 150);
         setContentPane(panelPrincipal);
         setLocationRelativeTo(null);
         setResizable(false);

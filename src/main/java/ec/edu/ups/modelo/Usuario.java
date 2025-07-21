@@ -5,6 +5,7 @@ import ec.edu.ups.util.ContrasenaValidar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -58,16 +59,25 @@ public class Usuario {
      * @param fechaNacimiento fecha de nacimiento
      */
     public Usuario(String username, Rol rol, String contrasenia, String nombre, String correo, String telefono, GregorianCalendar fechaNacimiento) {
-        this.username = username;
+        setUsername(username);
         this.rol = rol;
-        this.contrasenia = contrasenia;
+        setContrasenia(contrasenia);
         this.nombre = nombre;
         this.correo = correo;
         this.telefono = telefono;
-        this.fechaNacimiento = fechaNacimiento;
+
+        // Asignar fecha por defecto si es null
+        if (fechaNacimiento == null) {
+            this.fechaNacimiento = new GregorianCalendar(2006, Calendar.NOVEMBER, 15);
+        } else {
+            this.fechaNacimiento = fechaNacimiento;
+        }
+
         this.carritos = new ArrayList<>();
         this.respuestaSegu = new ArrayList<>();
     }
+
+
 
     /**
      * Constructor para crear un usuario con correo, rol y contraseña.
@@ -79,7 +89,7 @@ public class Usuario {
     public Usuario(String correo, Rol rol, String contrasenia) {
         this.correo = correo;
         this.rol = rol;
-        this.contrasenia = contrasenia;
+        setContrasenia(contrasenia);
         this.carritos = new ArrayList<>();
         this.respuestaSegu = new ArrayList<>();
     }
