@@ -10,6 +10,7 @@ public class GuardarArchivo extends JFrame {
     private JLabel lblTitulo;
     private JButton btnMemoria;
     private JButton btnArchivos;
+    private JButton btnBinario;
     private JFileChooser documentos;
 
     private MensajeInternacionalizacionHandler Internacionalizar;
@@ -58,6 +59,7 @@ public class GuardarArchivo extends JFrame {
         lblTitulo.setText(Internacionalizar.get("guardar.archivo.titulo"));
         btnMemoria.setText(Internacionalizar.get("boton.memoria"));
         btnArchivos.setText(Internacionalizar.get("boton.archivos"));
+        btnBinario.setText(Internacionalizar.get("boton.binario"));
 
         menuIdiomas.setText(Internacionalizar.get("idiomas.menu"));
         menuItemEspañol.setText(Internacionalizar.get("etiqueta.idioma.Español"));
@@ -72,6 +74,8 @@ public class GuardarArchivo extends JFrame {
     public JButton getBtnArchivos() {
         return btnArchivos;
     }
+
+    public JButton getBtnBinario() { return btnBinario; }
 
     public String RutaArchivo() {
         int seleccionar = documentos.showOpenDialog(this);

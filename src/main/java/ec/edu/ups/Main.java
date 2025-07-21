@@ -8,12 +8,16 @@ import ec.edu.ups.dao.CarritoDAO;
 import ec.edu.ups.dao.PreguntaDAO;
 import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.dao.UsuarioDAO;
+import ec.edu.ups.dao.impl.DAOCarrito.CarritoDAOArchivoBinario;
 import ec.edu.ups.dao.impl.DAOCarrito.CarritoDAOArchivoTexto;
 import ec.edu.ups.dao.impl.DAOCarrito.CarritoDAOMemoria;
 import ec.edu.ups.dao.impl.DAOPregunta.PreguntaDAOArchivoBinario;
+import ec.edu.ups.dao.impl.DAOPregunta.PreguntaDAOArchivoTexto;
 import ec.edu.ups.dao.impl.DAOPregunta.PreguntaDAOMemoria;
 import ec.edu.ups.dao.impl.DAOProducto.ProductoDAOArchivoBinario;
+import ec.edu.ups.dao.impl.DAOProducto.ProductoDAOArchivoTexto;
 import ec.edu.ups.dao.impl.DAOProducto.ProductoDAOMemoria;
+import ec.edu.ups.dao.impl.DAOUsuario.UsuarioDAOArchivoBinario;
 import ec.edu.ups.dao.impl.DAOUsuario.UsuarioDAOArchivoTexto;
 import ec.edu.ups.dao.impl.DAOUsuario.UsuarioDAOMemoria;
 import ec.edu.ups.modelo.Carrito;
@@ -83,13 +87,22 @@ public class Main {
                         guardarArchivo.setVisible(false);
                         String ruta = guardarArchivo.RutaArchivo();
                         UsuarioDAO usuarioDAO = new UsuarioDAOArchivoTexto(ruta);
-
-                        ProductoDAO productoDAO = new ProductoDAOArchivoBinario(ruta);
-
+                        ProductoDAO productoDAO = new ProductoDAOArchivoTexto(ruta);
                         CarritoDAO carritoDAO = new CarritoDAOArchivoTexto(ruta);
+                        PreguntaDAO preguntaDAO = new PreguntaDAOArchivoTexto(ruta);
+                        iniciarApp(usuarioDAO, productoDAO, carritoDAO, preguntaDAO, Internacionalizar);
+                    }
+                });
 
+                guardarArchivo.getBtnBinario().addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        guardarArchivo.setVisible(false);
+                        String ruta = guardarArchivo.RutaArchivo();
+                        UsuarioDAO usuarioDAO = new UsuarioDAOArchivoBinario(ruta);
+                        ProductoDAO productoDAO = new ProductoDAOArchivoBinario(ruta);
+                        CarritoDAO carritoDAO = new CarritoDAOArchivoBinario(ruta);
                         PreguntaDAO preguntaDAO = new PreguntaDAOArchivoBinario(ruta);
-
                         iniciarApp(usuarioDAO, productoDAO, carritoDAO, preguntaDAO, Internacionalizar);
                     }
                 });
@@ -286,7 +299,7 @@ public class Main {
                     ProductoController productoController = new ProductoController(productoAnadirView, productoListaView, productoEliminarView, productoModificarView, productoDAO, Internacionalizar);
 
                     CarritoController carritoController = new CarritoController(carritoDAO, productoDAO, carritoAnadirView, carritoModificarView,
-                            carritoEliminarView, carritoListarView, carritoListarMisItemsView, Internacionalizar);
+                            carritoEliminarView, carritoListarView, carritoListarMisItemsView, Internacionalizar, usuarioAutenticado);
 
                     UsuarioController usuarioController = new UsuarioController(usuarioCrearView, usuarioEliminarView,
                             usuarioListarView, usuarioModificarView, usuarioAutenticado, usuarioDAO, Internacionalizar);

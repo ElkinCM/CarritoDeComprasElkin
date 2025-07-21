@@ -154,7 +154,7 @@ public class UsuarioController {
             try {
                 anio = Integer.parseInt(anioStr);
             } catch (NumberFormatException ex) {
-                usuarioCrearView.mostrarMensaje("Año inválido.");
+                usuarioCrearView.mostrarMensaje(Internacionalizar.get("mensaje.anio.invalido"));
                 return;
             }
 
@@ -192,18 +192,18 @@ public class UsuarioController {
     private int convertirMesAInt(String mes) {
         mes = mes.toLowerCase();
         switch (mes) {
-            case "enero": return 0;
-            case "febrero": return 1;
-            case "marzo": return 2;
-            case "abril": return 3;
-            case "mayo": return 4;
-            case "junio": return 5;
-            case "julio": return 6;
-            case "agosto": return 7;
-            case "septiembre": return 8;
-            case "octubre": return 9;
-            case "noviembre": return 10;
-            case "diciembre": return 11;
+            case "mes.enero": return 0;
+            case "mes.febrero": return 1;
+            case "mes.marzo": return 2;
+            case "mes.abril": return 3;
+            case "mes.mayo": return 4;
+            case "mes.junio": return 5;
+            case "mes.julio": return 6;
+            case "mes.agosto": return 7;
+            case "mes.septiembre": return 8;
+            case "mes.octubre": return 9;
+            case "mes.noviembre": return 10;
+            case "mes.diciembre": return 11;
             default: return 0; // También puedes lanzar una excepción si prefieres
         }
     }
@@ -239,7 +239,7 @@ public class UsuarioController {
             public void actionPerformed(ActionEvent e) {
                 String input = usuarioListarView.getTxtNombre().getText().trim();
                 if (input.isEmpty()) {
-                    usuarioListarView.mostrarMensaje("Por favor, ingrese un nombre de usuario.");
+                    usuarioListarView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.invalido"));
                     return;
                 }
                 Usuario usuario = usuarioDAO.buscarPorUsuario(input);
@@ -254,7 +254,7 @@ public class UsuarioController {
             List<Usuario> usuarios = usuarioDAO.listarTodos();
 
             if (usuarios == null || usuarios.isEmpty()) {
-                usuarioListarView.mostrarMensaje("No hay usuarios registrados.");
+                usuarioListarView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.noregistrado"));
             } else {
                 usuarioListarView.cargarDatosListaUsuario(usuarios);
             }
@@ -419,7 +419,7 @@ public class UsuarioController {
         String username = usuarioModificarView.getTxtUsuario().getText().trim();
 
         if (username.isEmpty()) {
-            usuarioModificarView.mostrarMensaje("Ingrese un nombre de usuario.");
+            usuarioModificarView.mostrarMensaje(Internacionalizar.get("mensaje.completar.campos"));
             return;
         }
 

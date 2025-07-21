@@ -28,7 +28,7 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
         usuarios = new ArrayList<>();
         // Usuarios por defecto
         try {
-            crear(new Usuario("0107113474", Rol.ADMINISTRADOR, "Admin1@", "Administrador", "admin@dominio.com", "1234567890", null));
+            crear(new Usuario("0107113474", Rol.ADMINISTRADOR, "M@ura1", "Administrador", "admin@dominio.com", "1234567890", null));
         } catch (Exception e) {
             System.err.println("Error creando usuario por defecto: " + e.getMessage());
         }

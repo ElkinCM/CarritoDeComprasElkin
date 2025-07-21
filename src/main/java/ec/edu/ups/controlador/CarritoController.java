@@ -49,9 +49,15 @@ public class CarritoController {
      * @param carritoListarMisItemsView Vista para mostrar detalles del carrito.
      * @param internacionalizar Handler para mensajes internacionalizados.
      */
-    public CarritoController(CarritoDAO carritoDAO, ProductoDAO productoDAO, CarritoAnadirView carritoAnadirView,
-                             CarritoModificarView carritoModificarView, CarritoEliminarView carritoEliminarView,
-                             CarritoListarView carritoListarView, CarritoListarMisItemsView carritoListarMisItemsView, MensajeInternacionalizacionHandler internacionalizar) {
+    public CarritoController(CarritoDAO carritoDAO, ProductoDAO productoDAO,
+                             CarritoAnadirView carritoAnadirView,
+                             CarritoModificarView carritoModificarView,
+                             CarritoEliminarView carritoEliminarView,
+                             CarritoListarView carritoListarView,
+                             CarritoListarMisItemsView carritoListarMisItemsView,
+                             MensajeInternacionalizacionHandler internacionalizar,
+                             Usuario usuario) { // ← nuevo parámetro
+
         this.Internacionalizar = internacionalizar;
         this.carritoDAO = carritoDAO;
         this.productoDAO = productoDAO;
@@ -61,7 +67,8 @@ public class CarritoController {
         this.carritoListarView = carritoListarView;
         this.carritoListarMisItemsView = carritoListarMisItemsView;
 
-        this.carrito = new Carrito(usuario);
+        this.usuario = usuario; // ← guarda el usuario
+        this.carrito = new Carrito(usuario); // ← crea el carrito con usuario
 
         configurarAnadirCa();
         configurarModificarCa();
@@ -69,6 +76,7 @@ public class CarritoController {
         configurarListarCa();
         actualizarIdioma(Internacionalizar.getLocale().getLanguage(), Internacionalizar.getLocale().getCountry());
     }
+
     /**
      * Configura los listeners para la vista de añadir carrito.
      */
@@ -93,10 +101,24 @@ public class CarritoController {
         carritoAnadirView.getBtnBuscar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int codigo = Integer.parseInt(carritoAnadirView.getTxtCodigo().getText());
-                buscarEnCarrito(codigo);
+                String textoCodigo = carritoAnadirView.getTxtCodigo().getText().trim();
+
+                if (textoCodigo.isEmpty()) {
+                    String mensaje = Internacionalizar.get("carrito.codigo.vacio"); // Asegúrate de tener esta clave en tus properties
+                    carritoAnadirView.mostrarMensaje(mensaje);
+                    return;
+                }
+
+                try {
+                    int codigo = Integer.parseInt(textoCodigo);
+                    buscarEnCarrito(codigo);
+                } catch (NumberFormatException ex) {
+                    String mensaje = Internacionalizar.get("carrito.codigo.no.numero"); // Asegúrate de tener esta clave también
+                    carritoAnadirView.mostrarMensaje(mensaje);
+                }
             }
         });
+
         carritoAnadirView.getBtnCancelar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -462,7 +484,7 @@ public class CarritoController {
                 carritoListarView.vaciarCampo();
 
                 if (usuario == null) {
-                    carritoListarView.mostrarMensaje("Usuario no autenticado. Por favor inicia sesión.");
+                    carritoListarView.mostrarMensaje(Internacionalizar.get("mensaje.usuario.noautenticado"));
                     return;
                 }
 
